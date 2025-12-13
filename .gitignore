@@ -103,3 +103,9 @@ dist
 # Temporary folders
 tmp/
 temp/
+
+# Foundry
+/out/
+/cache/
+/lib/
+broadcast/
