@@ -1,150 +1,85 @@
-# BethNa AI Trader
+# Base Web3 - Sentient Trader
 
-Autonomous AI options trading system built on Base L2 that integrates with Thetanuts Finance V4.
-
-## Overview
-
-BethNa is a sophisticated multi-agent AI system that autonomously trades options through three specialized AI agents:
-
-- **Agent Alpha**: Quantitative analysis and market backtesting
-- **Agent Beta**: On-chain trade execution via smart contracts  
-- **Agent Gamma**: Social engagement and public relations
-
-## Features
-
-- 🤖 **Multi-Agent AI System**: Three specialized agents working in coordination
-- 📊 **Professional Trading Terminal**: Real-time charts, positions, and agent communications
-- ⛓️ **Base L2 Integration**: Built for Base network with Coinbase Smart Wallet support
-- 🎯 **Options Trading**: Automated options trading via Thetanuts V4 protocol
-- 📱 **Social Integration**: Automated social media posting with trade updates
-- 🔒 **Smart Contracts**: Secure on-chain execution with proper risk management
-
-## Tech Stack
-
-- **Frontend**: Next.js 14, TypeScript, Tailwind CSS, Shadcn/UI
-- **Blockchain**: viem, wagmi, OnchainKit
-- **Testing**: fast-check (Property-Based Testing)
-- **Package Manager**: pnpm
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+ 
-- pnpm
-- Base network wallet (Coinbase Smart Wallet recommended)
-
-### Installation
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd bethna-ai-trader
-```
-
-2. Install dependencies:
-```bash
-pnpm install
-```
-
-3. Set up environment variables:
-```bash
-cp .env.example .env.local
-```
-
-4. Configure your environment variables in `.env.local`:
-   - Base L2 RPC URLs
-   - Contract addresses (when deployed)
-   - API keys for external services
-   - OnchainKit API key
-
-5. Run the development server:
-```bash
-pnpm dev
-```
-
-6. Open [http://localhost:3000](http://localhost:3000) in your browser.
+A comprehensive Web3 trading platform combining AI agents, smart contracts, and real-time market analysis.
 
 ## Project Structure
 
 ```
-src/
-├── agents/          # AI agent implementations
-├── components/      # React components
-│   ├── ui/         # Shadcn/UI components
-│   └── trading/    # Trading-specific components
-├── config/         # Configuration files
-├── contracts/      # Smart contract interfaces
-├── hooks/          # Custom React hooks
-├── providers/      # Context providers
-├── types/          # TypeScript type definitions
-└── utils/          # Utility functions
+base-web3/
+├── bethna-ai-trader/          # Main project directory
+│   ├── agent-alpha/           # Python AI trading agent
+│   ├── contracts/             # Solidity smart contracts
+│   ├── src/                   # Next.js frontend
+│   ├── public/                # Static assets
+│   └── scripts/               # Utility scripts
+├── Agent.md                   # Agent documentation
+└── NEYNAR.md                  # Neynar integration guide
 ```
 
-## Environment Variables
+## Components
 
-See `.env.example` for all required environment variables:
+### 1. Smart Contracts (`contracts/`)
+- **SentientTrader.sol** - Main trading contract
+- Integrations with Thetanuts Router and ERC20 tokens
+- Test suite with fuzzing capabilities
 
-- **Base L2 Configuration**: Chain IDs and RPC URLs
-- **Contract Addresses**: SentientTrader and Thetanuts Router contracts
-- **API Keys**: Binance, Thetanuts, OpenAI, Twitter, Farcaster
-- **OnchainKit**: API key for Coinbase integration
+### 2. Python Agent (`agent-alpha/`)
+- Trading indicators and signals
+- Binance market data integration
+- Service-based architecture for modularity
 
-## Development
+### 3. Frontend (`src/`)
+- Next.js-based web interface
+- Wagmi integration for Web3 connectivity
+- Farcaster integration for social features
+- Trading components and UI
 
-### Running Tests
+## Getting Started
+
+### Prerequisites
+- Node.js 18+
+- Python 3.8+
+- Foundry (for Solidity development)
+
+### Installation
 
 ```bash
-# Run all tests
+cd bethna-ai-trader
+
+# Install dependencies
+pnpm install
+
+# Python dependencies
+cd agent-alpha
+pip install -r requirements.txt
+```
+
+### Development
+
+```bash
+# Run Next.js dev server
+pnpm dev
+
+# Run tests
 pnpm test
 
-# Run property-based tests
-pnpm test:pbt
-
-# Run with coverage
-pnpm test:coverage
+# Run Python tests
+cd agent-alpha
+pytest
 ```
 
-### Building
+## Configuration
 
-```bash
-pnpm build
-```
+- **Contracts**: See [contracts/](bethna-ai-trader/contracts/)
+- **Agent**: See [agent-alpha/README.md](bethna-ai-trader/agent-alpha/README.md)
+- **Web3 Config**: See [src/config/](bethna-ai-trader/src/config/)
 
-### Linting
+## Documentation
 
-```bash
-pnpm lint
-```
-
-## Architecture
-
-The system follows a multi-agent architecture:
-
-1. **Agent Alpha** fetches market data, calculates technical indicators, and generates trading signals
-2. **Agent Beta** receives signals and executes trades via smart contracts
-3. **Agent Gamma** monitors trade events and creates social media content
-4. **Trading Terminal** provides real-time monitoring and control interface
-
-## Smart Contracts
-
-The system interacts with:
-
-- **SentientTrader Contract**: Custom contract for options trading operations
-- **Thetanuts V4 Router**: Protocol for options liquidity and execution
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Submit a pull request
+- [Agent Documentation](Agent.md)
+- [Neynar Integration](NEYNAR.md)
+- [Agent Alpha README](bethna-ai-trader/agent-alpha/README.md)
 
 ## License
 
-[License information to be added]
-
-## Disclaimer
-
-This software is for educational and research purposes. Trading involves risk and you should never trade with money you cannot afford to lose. The developers are not responsible for any financial losses.
+See individual component licenses in respective directories.
