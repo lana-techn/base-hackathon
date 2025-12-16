@@ -215,10 +215,14 @@ class SignalGenerator:
         
         # BB position component (20%)
         bb_range = bb_upper - bb_lower
-        if signal == "BUY_CALL":
+        if bb_range == 0:
+            # Constant prices result in zero range - default to 0 for BB score
+            bb_score = 0.0
+        elif signal == "BUY_CALL":
             bb_score = max(0, (bb_lower - price) / bb_range) * 100 * 0.2
         else:  # BUY_PUT
             bb_score = max(0, (price - bb_upper) / bb_range) * 100 * 0.2
         
         confidence = win_rate_score + rsi_score + bb_score
         return min(100, max(0, confidence))
+
