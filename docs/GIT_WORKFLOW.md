@@ -69,11 +69,23 @@ git push origin main
 
 ## 🔧 Vercel Deployment Strategy
 
-### **Branch Deployments**
+### **Deployment Approach**
 
-- **main** → Production deployment (https://bethna-ai-trader.vercel.app)
-- **development** → Preview deployment (https://bethna-ai-trader-dev.vercel.app)
-- **feature/*** → Feature preview deployments
+Due to Vercel collaboration limitations, we use separate deployment strategies:
+
+- **Production** (lana-techn): https://bethna-ai-trader.vercel.app
+- **Development** (maulana-tech): https://bethna-ai-trader-dev.vercel.app
+
+### **Deployment Commands**
+
+```bash
+# Development deployment (maulana-tech)
+./scripts/deploy-dev.sh
+
+# Production deployment (lana-techn only)
+./scripts/switch-user.sh prod
+vercel --prod
+```
 
 ### **Environment Variables by Branch**
 
