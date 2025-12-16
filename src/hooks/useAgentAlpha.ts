@@ -34,25 +34,39 @@ interface UseAgentAlphaReturn {
   refresh: () => void
 }
 
-// Mock Agent Alpha Client (will be replaced with real implementation)
+// Agent Alpha Client with Vercel API fallback
 class AgentAlphaClient {
-  private baseUrl = 'http://localhost:8000'
+  private baseUrl = process.env.NEXT_PUBLIC_AGENT_ALPHA_URL || 'http://localhost:8000'
+  private useVercelApi = false
 
   async getAnalysis(symbol: string, interval: string): Promise<Analysis> {
     try {
+      // Try external Agent Alpha service first
+      if (!this.useVercelApi) {
+        const params = new URLSearchParams({ symbol, interval })
+        const response = await fetch(`${this.baseUrl}/analyze?${params}`)
+        if (response.ok) {
+          return response.json()
+        }
+        // If external service fails, switch to Vercel API
+        console.log('External Agent Alpha unavailable, switching to Vercel API')
+        this.useVercelApi = true
+      }
+      
+      // Use Vercel API routes
       const params = new URLSearchParams({ symbol, interval })
-      const response = await fetch(`${this.baseUrl}/analyze?${params}`)
+      const response = await fetch(`/api/analyze?${params}`)
       if (!response.ok) {
         throw new Error(`Failed to fetch analysis: ${response.statusText}`)
       }
       return response.json()
     } catch (error) {
-      // Return mock data when service is not available
+      // Final fallback to mock data
       return {
         signal: 'HOLD',
         confidence: 0,
         win_rate: 0,
-        reasoning: 'Agent Alpha service not available - using mock data',
+        reasoning: 'All services unavailable - using fallback data',
         timestamp: Date.now()
       }
     }
@@ -60,21 +74,33 @@ class AgentAlphaClient {
 
   async getCandles(symbol: string, interval: string, limit: number = 100): Promise<TechnicalIndicators> {
     try {
-      const params = new URLSearchParams({ 
-        symbol, 
-        interval, 
-        limit: limit.toString() 
-      })
-      const response = await fetch(`${this.baseUrl}/candles?${params}`)
+      // Try external Agent Alpha service first
+      if (!this.useVercelApi) {
+        const params = new URLSearchParams({ 
+          symbol, 
+          interval, 
+          limit: limit.toString() 
+        })
+        const response = await fetch(`${this.baseUrl}/indicators?${params}`)
+        if (response.ok) {
+          return response.json()
+        }
+        // If external service fails, switch to Vercel API
+        this.useVercelApi = true
+      }
+      
+      // Use Vercel API routes
+      const params = new URLSearchParams({ symbol, interval })
+      const response = await fetch(`/api/indicators?${params}`)
       if (!response.ok) {
-        throw new Error(`Failed to fetch candles: ${response.statusText}`)
+        throw new Error(`Failed to fetch indicators: ${response.statusText}`)
       }
       return response.json()
     } catch (error) {
-      // Return mock data when service is not available
-      const mockPrice = 3200 + Math.random() * 200 - 100 // ETH price around $3200
+      // Final fallback to mock data
+      const mockPrice = 3200 + Math.random() * 200 - 100
       return {
-        rsi: 45 + Math.random() * 20, // RSI between 45-65
+        rsi: 45 + Math.random() * 20,
         bollinger_upper: mockPrice + 150,
         bollinger_middle: mockPrice,
         bollinger_lower: mockPrice - 150,
@@ -86,9 +112,20 @@ class AgentAlphaClient {
 
   async checkHealth(): Promise<boolean> {
     try {
-      const response = await fetch(`${this.baseUrl}/health`, { 
+      // Try external service first
+      if (!this.useVercelApi) {
+        const response = await fetch(`${this.baseUrl}/health`, { 
+          method: 'GET',
+          signal: AbortSignal.timeout(5000)
+        })
+        if (response.ok) return true
+        this.useVercelApi = true
+      }
+      
+      // Check Vercel API
+      const response = await fetch('/api/health', { 
         method: 'GET',
-        signal: AbortSignal.timeout(5000) // 5 second timeout
+        signal: AbortSignal.timeout(5000)
       })
       return response.ok
     } catch (error) {

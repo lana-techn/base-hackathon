@@ -321,6 +321,38 @@ echo $BINANCE_API_KEY  # Optional
 4. Push to branch: `git push origin feature/amazing-feature`
 5. Open Pull Request
 
+## 🚀 Deployment
+
+### Quick Deploy to Vercel
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/lana-techn/base-hackathon&project-name=bethna-ai-trader&repository-name=bethna-ai-trader)
+
+**One-click deployment:**
+1. Click the deploy button above
+2. Connect your GitHub account
+3. Set environment variables:
+   - `NEXT_PUBLIC_ONCHAINKIT_API_KEY` (required)
+   - Other API keys (optional)
+4. Deploy!
+
+**Manual deployment:**
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy
+cd bethna-ai-trader
+vercel
+```
+
+### Deployment Options
+
+1. **Vercel (Recommended for MVP)** - Frontend + API routes
+2. **Hybrid** - Vercel frontend + Railway/Render backend  
+3. **Full Cloud** - Enterprise setup with monitoring
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment guide.
+
 ## 📄 License
 
 MIT License - see LICENSE file for details

@@ -1,0 +1,21 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "pnpm build",
+  "devCommand": "pnpm dev",
+  "installCommand": "pnpm install",
+  "functions": {
+    "app/**/*.ts": {
+      "runtime": "@vercel/node"
+    }
+  },
+  "env": {
+    "NEXT_PUBLIC_ONCHAINKIT_API_KEY": "@onchainkit_api_key",
+    "NEXT_PUBLIC_BASE_RPC_URL": "https://mainnet.base.org",
+    "NEXT_PUBLIC_BASE_TESTNET_RPC_URL": "https://sepolia.base.org"
+  },
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_AGENT_ALPHA_URL": "@agent_alpha_url"
+    }
+  }
+}
