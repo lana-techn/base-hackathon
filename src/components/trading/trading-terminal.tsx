@@ -6,11 +6,22 @@ import { Badge } from "@/components/ui/badge"
 import { useAgentAlpha, getSignalColor, getSignalBgColor, getRSIColor } from "@/hooks/useAgentAlpha"
 import { RefreshCw, TrendingUp, TrendingDown, Activity, Wifi, WifiOff } from "lucide-react"
 import { useState, useEffect } from "react"
+import { ConnectWallet } from '@coinbase/onchainkit/wallet'
 
 interface LogEntry {
   timestamp: Date;
   agent: 'ALPHA' | 'BETA' | 'GAMMA' | 'SYSTEM';
   message: string;
+}
+
+// Helper function to format timestamp consistently
+const formatTimestamp = (date: Date): string => {
+  return date.toLocaleTimeString('en-US', { 
+    hour12: false,
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
 }
 
 export function TradingTerminal() {
@@ -29,9 +40,14 @@ export function TradingTerminal() {
     autoRefresh: true,
   });
 
-  const [logs, setLogs] = useState<LogEntry[]>([
-    { timestamp: new Date(), agent: 'SYSTEM', message: 'BethNa AI Trader initialized' },
-  ]);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [isClient, setIsClient] = useState(false);
+
+  // Initialize client-side only
+  useEffect(() => {
+    setIsClient(true);
+    setLogs([{ timestamp: new Date(), agent: 'SYSTEM', message: 'BethNa AI Trader initialized' }]);
+  }, []);
 
   // Add logs when analysis updates
   useEffect(() => {
@@ -90,7 +106,7 @@ export function TradingTerminal() {
               <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
-            <Button variant="outline">Connect Wallet</Button>
+            <ConnectWallet />
           </div>
         </div>
 
@@ -163,7 +179,7 @@ export function TradingTerminal() {
                       <div className="text-center">
                         <div className="text-xs text-muted-foreground mb-1">Last Update</div>
                         <div className="text-sm font-mono">
-                          {lastUpdate?.toLocaleTimeString() || 'Never'}
+                          {isClient && lastUpdate ? formatTimestamp(lastUpdate) : 'Never'}
                         </div>
                       </div>
                     </div>
@@ -241,9 +257,9 @@ export function TradingTerminal() {
           <CardContent>
             <div className="h-[200px] bg-black rounded-md p-4 font-mono text-sm overflow-y-auto">
               <div className="space-y-1">
-                {logs.map((log, i) => (
+                {isClient && logs.map((log, i) => (
                   <p key={i}>
-                    <span className="text-gray-500">[{log.timestamp.toLocaleTimeString()}]</span>{' '}
+                    <span className="text-gray-500">[{formatTimestamp(log.timestamp)}]</span>{' '}
                     <span className={getAgentColor(log.agent)}>{log.agent}:</span>{' '}
                     <span className="text-gray-300">{log.message}</span>
                   </p>
