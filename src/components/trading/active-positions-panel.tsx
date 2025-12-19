@@ -42,9 +42,9 @@ export function ActivePositionsPanel({
     }
 
     const getPnLColor = (pnl: number) => {
-        if (pnl > 0) return 'text-green-400'
-        if (pnl < 0) return 'text-red-400'
-        return 'text-gray-400'
+        if (pnl > 0) return 'text-success'
+        if (pnl < 0) return 'text-error'
+        return 'text-muted-foreground'
     }
 
     return (
@@ -80,9 +80,9 @@ export function ActivePositionsPanel({
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="flex items-center gap-2">
                                         {position.optionType === 'CALL' ? (
-                                            <TrendingUp className="h-4 w-4 text-green-400" />
+                                            <TrendingUp className="h-4 w-4 text-success" />
                                         ) : (
-                                            <TrendingDown className="h-4 w-4 text-red-400" />
+                                            <TrendingDown className="h-4 w-4 text-error" />
                                         )}
                                         <span className="font-medium">
                                             ETH ${position.strike} {position.optionType}

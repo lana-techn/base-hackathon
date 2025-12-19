@@ -73,10 +73,10 @@ export function TradingTerminal() {
 
   const getAgentColor = (agent: string) => {
     switch (agent) {
-      case 'ALPHA': return 'text-cyan-400';
-      case 'BETA': return 'text-yellow-400';
-      case 'GAMMA': return 'text-purple-400';
-      default: return 'text-green-400';
+      case 'ALPHA': return 'text-info';
+      case 'BETA': return 'text-warning';
+      case 'GAMMA': return 'text-primary';
+      default: return 'text-success';
     }
   };
 
@@ -88,7 +88,7 @@ export function TradingTerminal() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold text-primary">
               BethNa AI Trader
             </h1>
             <Badge variant={isConnected ? "default" : "destructive"} className="gap-1">
@@ -112,7 +112,7 @@ export function TradingTerminal() {
 
         {/* Error Banner */}
         {error && (
-          <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-4 text-red-400">
+          <div className="bg-destructive/20 border border-destructive/50 rounded-lg p-4 text-destructive">
             <strong>Error:</strong> {error}
           </div>
         )}
@@ -142,9 +142,9 @@ export function TradingTerminal() {
                     </div>
 
                     {/* Visual Price Bar */}
-                    <div className="relative h-32 bg-gradient-to-t from-red-500/20 via-yellow-500/20 to-green-500/20 rounded-lg border">
+                    <div className="relative h-32 bg-gradient-to-t from-error/20 via-warning/20 to-success/20 rounded-lg border">
                       <div
-                        className="absolute left-0 right-0 h-2 bg-white/80 rounded"
+                        className="absolute left-0 right-0 h-2 bg-foreground/80 rounded"
                         style={{
                           top: `${Math.min(95, Math.max(5, ((indicators.bollinger_upper - indicators.current_price) / (indicators.bollinger_upper - indicators.bollinger_lower)) * 100))}%`
                         }}
@@ -255,13 +255,13 @@ export function TradingTerminal() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[200px] bg-black rounded-md p-4 font-mono text-sm overflow-y-auto">
+            <div className="h-[200px] bg-secondary rounded-md p-4 font-mono text-sm overflow-y-auto">
               <div className="space-y-1">
                 {isClient && logs.map((log, i) => (
                   <p key={i}>
-                    <span className="text-gray-500">[{formatTimestamp(log.timestamp)}]</span>{' '}
+                    <span className="text-muted-foreground">[{formatTimestamp(log.timestamp)}]</span>{' '}
                     <span className={getAgentColor(log.agent)}>{log.agent}:</span>{' '}
-                    <span className="text-gray-300">{log.message}</span>
+                    <span className="text-foreground">{log.message}</span>
                   </p>
                 ))}
               </div>

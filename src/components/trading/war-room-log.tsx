@@ -28,11 +28,11 @@ export function WarRoomLog({ logs, maxHeight = "200px" }: WarRoomLogProps) {
 
     const getAgentColor = (agent: string) => {
         switch (agent) {
-            case 'ALPHA': return 'text-cyan-400'
-            case 'BETA': return 'text-yellow-400'
-            case 'GAMMA': return 'text-purple-400'
-            case 'SYSTEM': return 'text-green-400'
-            default: return 'text-gray-400'
+            case 'ALPHA': return 'text-info'
+            case 'BETA': return 'text-warning'
+            case 'GAMMA': return 'text-primary'
+            case 'SYSTEM': return 'text-success'
+            default: return 'text-muted-foreground'
         }
     }
 
@@ -69,22 +69,22 @@ export function WarRoomLog({ logs, maxHeight = "200px" }: WarRoomLogProps) {
             <CardContent>
                 <div
                     ref={scrollRef}
-                    className="bg-black/80 rounded-md p-3 font-mono text-xs overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent"
+                    className="bg-secondary rounded-md p-3 font-mono text-xs overflow-y-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent"
                     style={{ height: maxHeight }}
                 >
                     {logs.length === 0 ? (
-                        <p className="text-gray-500 animate-pulse">Initializing agents...</p>
+                        <p className="text-muted-foreground animate-pulse">Initializing agents...</p>
                     ) : (
                         <div className="space-y-0.5">
                             {logs.map((log, i) => (
-                                <div key={i} className="flex gap-2 leading-relaxed hover:bg-white/5 px-1 -mx-1 rounded">
-                                    <span className="text-gray-600 shrink-0">
+                                <div key={i} className="flex gap-2 leading-relaxed hover:bg-accent px-1 -mx-1 rounded">
+                                    <span className="text-muted-foreground shrink-0">
                                         [{formatTimestamp(log.timestamp)}]
                                     </span>
                                     <span className={`shrink-0 ${getAgentColor(log.agent)}`}>
                                         {log.agent}:
                                     </span>
-                                    <span className="text-gray-300 break-all">
+                                    <span className="text-foreground break-all">
                                         {getTypeIndicator(log.type)}{log.message}
                                     </span>
                                 </div>
