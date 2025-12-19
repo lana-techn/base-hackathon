@@ -48,7 +48,7 @@ module.exports = {
           foreground: "#ffffff",
         },
         warning: {
-          DEFAULT: "#f59e0b", 
+          DEFAULT: "#f59e0b",
           foreground: "#ffffff",
         },
         error: {
@@ -56,8 +56,15 @@ module.exports = {
           foreground: "#ffffff",
         },
         info: {
-          DEFAULT: "#3b82f6",
+          DEFAULT: "#7c3aed",
           foreground: "#ffffff",
+        },
+        // Orbit colors
+        orbit: {
+          400: "#a855f7",
+          500: "#8b5cf6",
+          600: "#7c3aed",
+          700: "#6d28d9",
         },
       },
       borderRadius: {
@@ -70,8 +77,11 @@ module.exports = {
         'gradient-y': 'gradient-y 15s ease infinite',
         'gradient-xy': 'gradient-xy 15s ease infinite',
         'float': 'float 6s ease-in-out infinite',
+        'float-slow': 'float-slow 8s ease-in-out infinite',
         'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
         'shimmer': 'shimmer 2s linear infinite',
+        'orbit-rotate': 'orbit-rotate 20s linear infinite',
+        'orbit-pulse': 'orbit-pulse 3s ease-in-out infinite',
       },
       keyframes: {
         'gradient-x': {
@@ -108,17 +118,35 @@ module.exports = {
           '0%, 100%': { transform: 'translateY(0px)' },
           '50%': { transform: 'translateY(-20px)' },
         },
+        'float-slow': {
+          '0%, 100%': { transform: 'translateY(0) scale(1)' },
+          '50%': { transform: 'translateY(-30px) scale(1.02)' },
+        },
         'pulse-glow': {
           '0%, 100%': {
-            'box-shadow': '0 0 20px rgba(59, 130, 246, 0.3), 0 0 40px rgba(59, 130, 246, 0.2)',
+            'box-shadow': '0 0 20px rgba(124, 58, 237, 0.3), 0 0 40px rgba(124, 58, 237, 0.2)',
           },
           '50%': {
-            'box-shadow': '0 0 40px rgba(59, 130, 246, 0.4), 0 0 80px rgba(59, 130, 246, 0.3)',
+            'box-shadow': '0 0 40px rgba(124, 58, 237, 0.4), 0 0 80px rgba(124, 58, 237, 0.3)',
           },
         },
         'shimmer': {
           '0%': { transform: 'translateX(-100%)' },
           '100%': { transform: 'translateX(100%)' },
+        },
+        'orbit-rotate': {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
+        },
+        'orbit-pulse': {
+          '0%, 100%': {
+            'box-shadow': '0 0 40px rgba(139, 92, 246, 0.4), 0 0 80px rgba(139, 92, 246, 0.3)',
+            opacity: '0.8',
+          },
+          '50%': {
+            'box-shadow': '0 0 80px rgba(139, 92, 246, 0.5), 0 0 160px rgba(139, 92, 246, 0.4)',
+            opacity: '1',
+          },
         },
       },
       backgroundImage: {
