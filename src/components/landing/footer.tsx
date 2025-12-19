@@ -69,29 +69,36 @@ const socialLinks = [
 
 export function Footer() {
   return (
-    <footer className="py-16 px-6 bg-muted/30 dark:bg-muted/10 border-t border-border/50 dark:border-white/10">
-      <div className="max-w-6xl mx-auto">
+    <footer className="relative py-16 px-6 bg-card/50 dark:bg-card/30 border-t border-border/50 dark:border-white/10 overflow-hidden">
+      {/* Large background branding */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+        <span className="text-[20rem] md:text-[30rem] font-bold text-muted-foreground/[0.03] dark:text-white/[0.02] select-none leading-none tracking-tighter">
+          bethna
+        </span>
+      </div>
+
+      <div className="max-w-6xl mx-auto relative z-10">
         {/* Main footer content */}
         <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-12">
           {/* Brand */}
           <div className="col-span-2">
             <Link href="/" className="inline-flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">B</span>
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orbit-500 to-primary flex items-center justify-center">
+                <span className="text-primary-foreground font-bold text-lg">B</span>
               </div>
               <span className="text-xl font-bold text-foreground">BethNa AI</span>
             </Link>
-            <p className="text-sm text-muted-foreground mb-4 max-w-xs">
+            <p className="text-sm text-muted-foreground mb-6 max-w-xs">
               Autonomous AI options trading system built on Base L2. Trade smarter with AI.
             </p>
-            
+
             {/* Social links */}
             <div className="flex items-center gap-3">
               {socialLinks.map((social) => (
                 <a
                   key={social.label}
                   href={social.href}
-                  className="p-2 rounded-lg bg-card/50 dark:bg-card/30 border border-border/50 dark:border-white/10 text-muted-foreground hover:text-foreground hover:border-border dark:hover:border-white/20 transition-all duration-300"
+                  className="p-2.5 rounded-xl bg-card/80 dark:bg-card/50 border border-border/50 dark:border-white/10 text-muted-foreground hover:text-orbit-500 hover:border-orbit-500/30 transition-all duration-300"
                   aria-label={social.label}
                 >
                   {social.icon}
@@ -99,14 +106,14 @@ export function Footer() {
               ))}
             </div>
           </div>
-          
+
           {/* Links */}
           <div>
             <h4 className="font-semibold text-foreground mb-4">Product</h4>
             <ul className="space-y-2">
               {footerLinks.product.map((link) => (
                 <li key={link.label}>
-                  <Link 
+                  <Link
                     href={link.href}
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
@@ -116,13 +123,13 @@ export function Footer() {
               ))}
             </ul>
           </div>
-          
+
           <div>
             <h4 className="font-semibold text-foreground mb-4">Resources</h4>
             <ul className="space-y-2">
               {footerLinks.resources.map((link) => (
                 <li key={link.label}>
-                  <Link 
+                  <Link
                     href={link.href}
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
@@ -132,13 +139,13 @@ export function Footer() {
               ))}
             </ul>
           </div>
-          
+
           <div>
             <h4 className="font-semibold text-foreground mb-4">Company</h4>
             <ul className="space-y-2">
               {footerLinks.company.map((link) => (
                 <li key={link.label}>
-                  <Link 
+                  <Link
                     href={link.href}
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
@@ -148,13 +155,13 @@ export function Footer() {
               ))}
             </ul>
           </div>
-          
+
           <div>
             <h4 className="font-semibold text-foreground mb-4">Legal</h4>
             <ul className="space-y-2">
               {footerLinks.legal.map((link) => (
                 <li key={link.label}>
-                  <Link 
+                  <Link
                     href={link.href}
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
@@ -165,16 +172,16 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        
+
         {/* Bottom bar */}
         <div className="pt-8 border-t border-border/50 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} BethNa AI Trader. All rights reserved.
           </p>
-          
+
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span>Built on</span>
-            <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-primary/10 dark:bg-primary/20 text-primary font-medium">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-orbit-500/10 dark:bg-orbit-500/20 text-orbit-500 font-medium">
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                 <circle cx="12" cy="12" r="10" />
               </svg>
