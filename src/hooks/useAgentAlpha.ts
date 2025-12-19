@@ -114,20 +114,37 @@ class AgentAlphaClient {
     try {
       // Try external service first
       if (!this.useVercelApi) {
-        const response = await fetch(`${this.baseUrl}/health`, { 
-          method: 'GET',
-          signal: AbortSignal.timeout(5000)
-        })
-        if (response.ok) return true
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 5000)
+        
+        try {
+          const response = await fetch(`${this.baseUrl}/health`, { 
+            method: 'GET',
+            signal: controller.signal
+          })
+          clearTimeout(timeoutId)
+          if (response.ok) return true
+        } catch (err) {
+          clearTimeout(timeoutId)
+        }
         this.useVercelApi = true
       }
       
       // Check Vercel API
-      const response = await fetch('/api/health', { 
-        method: 'GET',
-        signal: AbortSignal.timeout(5000)
-      })
-      return response.ok
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 5000)
+      
+      try {
+        const response = await fetch('/api/health', { 
+          method: 'GET',
+          signal: controller.signal
+        })
+        clearTimeout(timeoutId)
+        return response.ok
+      } catch (err) {
+        clearTimeout(timeoutId)
+        return false
+      }
     } catch (error) {
       return false
     }
@@ -219,31 +236,31 @@ export function useAgentAlpha({
 export function getSignalColor(signal: string): string {
   switch (signal) {
     case 'BUY_CALL':
-      return 'text-green-400'
+      return 'text-success'
     case 'BUY_PUT':
-      return 'text-red-400'
+      return 'text-error'
     case 'CLOSE_POSITION':
-      return 'text-yellow-400'
+      return 'text-warning'
     default:
-      return 'text-gray-400'
+      return 'text-muted-foreground'
   }
 }
 
 export function getSignalBgColor(signal: string): string {
   switch (signal) {
     case 'BUY_CALL':
-      return 'border-green-500/50 bg-green-500/10'
+      return 'border-success/50 bg-success/10'
     case 'BUY_PUT':
-      return 'border-red-500/50 bg-red-500/10'
+      return 'border-error/50 bg-error/10'
     case 'CLOSE_POSITION':
-      return 'border-yellow-500/50 bg-yellow-500/10'
+      return 'border-warning/50 bg-warning/10'
     default:
-      return 'border-gray-500/50 bg-gray-500/10'
+      return 'border-muted/50 bg-muted/10'
   }
 }
 
 export function getRSIColor(rsi: number): string {
-  if (rsi < 30) return 'text-green-400' // Oversold - potential buy
-  if (rsi > 70) return 'text-red-400'   // Overbought - potential sell
-  return 'text-yellow-400'              // Neutral
+  if (rsi < 30) return 'text-success' // Oversold - potential buy
+  if (rsi > 70) return 'text-error'   // Overbought - potential sell
+  return 'text-warning'               // Neutral
 }

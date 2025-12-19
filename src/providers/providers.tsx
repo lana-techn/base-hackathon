@@ -6,20 +6,23 @@ import { WagmiProvider } from 'wagmi'
 import { config } from '@/config/wagmi'
 import { base } from 'wagmi/chains'
 import { useState } from 'react'
+import { ThemeProvider } from '@/components/ui/theme-provider'
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient())
 
   return (
-    <WagmiProvider config={config}>
-      <QueryClientProvider client={queryClient}>
-        <OnchainKitProvider
-          apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY}
-          chain={base}
-        >
-          {children}
-        </OnchainKitProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
+    <ThemeProvider>
+      <WagmiProvider config={config}>
+        <QueryClientProvider client={queryClient}>
+          <OnchainKitProvider
+            apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY}
+            chain={base}
+          >
+            {children}
+          </OnchainKitProvider>
+        </QueryClientProvider>
+      </WagmiProvider>
+    </ThemeProvider>
   )
 }

@@ -1,5 +1,5 @@
-import { TradingTerminal } from "@/components/trading/trading-terminal";
+import { LandingPage } from '@/components/pages/landing-page'
 
 export default function Home() {
-  return <TradingTerminal />;
+  return <LandingPage />
 }
