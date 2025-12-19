@@ -1,21 +1,13 @@
 'use client'
 
-import { useEffect, useRef } from "react"
-import { gsap } from "gsap"
-import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
-
-// Register GSAP plugin
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger)
-}
 
 interface ParallaxScrollProps {
   children: React.ReactNode
   speed?: number
   direction?: 'up' | 'down'
   className?: string
-  trigger?: string
 }
 
 const ParallaxScroll = ({
@@ -23,43 +15,35 @@ const ParallaxScroll = ({
   speed = 0.5,
   direction = 'up',
   className,
-  trigger
 }: ParallaxScrollProps) => {
   const elementRef = useRef<HTMLDivElement>(null)
+  const [offset, setOffset] = useState(0)
 
   useEffect(() => {
-    if (!elementRef.current) return
+    const handleScroll = () => {
+      if (!elementRef.current) return
 
-    const element = elementRef.current
-    const multiplier = direction === 'up' ? -1 : 1
-    const yMovement = speed * 100 * multiplier
+      const rect = elementRef.current.getBoundingClientRect()
+      const windowHeight = window.innerHeight
+      const scrollProgress = (windowHeight - rect.top) / (windowHeight + rect.height)
 
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        element,
-        {
-          y: 0,
-        },
-        {
-          y: yMovement,
-          ease: "none",
-          scrollTrigger: {
-            trigger: trigger || element,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: true,
-          },
-        }
-      )
-    }, element)
+      const multiplier = direction === 'up' ? -1 : 1
+      const movement = scrollProgress * speed * 100 * multiplier
 
-    return () => ctx.revert()
-  }, [speed, direction, trigger])
+      setOffset(movement)
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll() // Initial call
+
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [speed, direction])
 
   return (
     <div
       ref={elementRef}
       className={cn("will-change-transform", className)}
+      style={{ transform: `translate3d(0, ${offset}px, 0)` }}
     >
       {children}
     </div>
