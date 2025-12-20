@@ -18,7 +18,7 @@ const steps = [
   {
     number: '02',
     title: 'Competitive real-time prices',
-    description: 'Choose the best quote from top providers like Binance, Coinbase, and DEXs.',
+    description: 'Choose the best quote from top providers like CoinGecko, Coinbase, and DEXs.',
     size: 'wide', // spans 2 columns
     visual: 'chart',
   },

@@ -28,10 +28,10 @@ const steps: Step[] = [
   {
     number: "01",
     title: "Data Collection",
-    description: "Agent Alpha continuously monitors market data from multiple sources including Binance, CoinGecko, and other major exchanges.",
+    description: "Agent Alpha continuously monitors market data from CoinGecko and other major data providers.",
     icon: <Database className="h-8 w-8" />,
     details: [
-      "Real-time price feeds from Binance API",
+      "Real-time price feeds from CoinGecko API",
       "720-hour historical data analysis", 
       "Technical indicator calculations",
       "Market sentiment analysis"

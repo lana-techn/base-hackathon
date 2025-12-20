@@ -1,4 +1,4 @@
-import { TradingSignal, Position, TradeEvent, AgentMessage, BinanceKlineResponse, ThetanutsOptionData, MarketData, CandlestickData } from '@/types'
+import { TradingSignal, Position, TradeEvent, AgentMessage, CoinGeckoOHLCResponse, CoinGeckoPriceResponse, ThetanutsOptionData, MarketData, CandlestickData } from '@/types'
 import { Address, isAddress } from 'viem'
 
 /**
@@ -145,29 +145,40 @@ export function validateTimestamp(timestamp: number): boolean {
 }
 
 /**
- * Schema validation for Binance API responses
+ * Schema validation for CoinGecko OHLC responses
  */
-export function validateBinanceKlineResponse(response: any): response is BinanceKlineResponse {
+export function validateCoinGeckoOHLCResponse(response: any): response is CoinGeckoOHLCResponse[] {
+  if (!Array.isArray(response)) {
+    return false
+  }
+
+  return response.every((candle: any) => {
+    return (
+      typeof candle === 'object' &&
+      candle !== null &&
+      typeof candle.timestamp === 'number' &&
+      typeof candle.open === 'number' &&
+      typeof candle.high === 'number' &&
+      typeof candle.low === 'number' &&
+      typeof candle.close === 'number'
+    )
+  })
+}
+
+/**
+ * Schema validation for CoinGecko price responses
+ */
+export function validateCoinGeckoPriceResponse(response: any): response is CoinGeckoPriceResponse {
   if (!response || typeof response !== 'object') {
     return false
   }
 
-  // Check if response has required structure
-  if (typeof response.symbol !== 'string' || !Array.isArray(response.data)) {
-    return false
-  }
-
-  // Validate each kline data array
-  return response.data.every((kline: any) => {
-    return Array.isArray(kline) && 
-           kline.length >= 12 &&
-           typeof kline[0] === 'number' && // Open time
-           typeof kline[1] === 'string' && // Open price
-           typeof kline[2] === 'string' && // High price
-           typeof kline[3] === 'string' && // Low price
-           typeof kline[4] === 'string' && // Close price
-           typeof kline[5] === 'string' && // Volume
-           typeof kline[6] === 'number'    // Close time
+  return Object.values(response).every((coin: any) => {
+    return (
+      typeof coin === 'object' &&
+      coin !== null &&
+      typeof coin.usd === 'number'
+    )
   })
 }
 
