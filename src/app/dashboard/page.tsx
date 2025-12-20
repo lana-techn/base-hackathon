@@ -1,5 +1,5 @@
-import { TradingTerminal } from '@/components/trading/trading-terminal'
+import { DashboardOverview } from '@/components/dashboard/dashboard-overview'
 
 export default function DashboardPage() {
-  return <TradingTerminal />
+  return <DashboardOverview />
 }

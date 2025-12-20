@@ -3,10 +3,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { useAgentAlpha, getSignalColor, getSignalBgColor, getRSIColor } from "@/hooks/useAgentAlpha"
-import { RefreshCw, TrendingUp, TrendingDown, Activity, Wifi, WifiOff } from "lucide-react"
+import { GlassCard } from "@/components/ui/glass-card"
+import { useAgentAlpha, getSignalColor, getSignalBgColor } from "@/hooks/useAgentAlpha"
+import { TradingChart } from "./trading-chart"
+import { WatchlistPanel } from "./watchlist-panel"
+import { AlertPanel } from "./alert-panel"
+import { RefreshCw, TrendingUp, TrendingDown, Activity, Wifi, WifiOff, Zap, Target, BarChart3, Bot } from "lucide-react"
 import { useState, useEffect } from "react"
-import { ConnectWallet } from '@coinbase/onchainkit/wallet'
 
 interface LogEntry {
   timestamp: Date;
@@ -14,9 +17,8 @@ interface LogEntry {
   message: string;
 }
 
-// Helper function to format timestamp consistently
 const formatTimestamp = (date: Date): string => {
-  return date.toLocaleTimeString('en-US', { 
+  return date.toLocaleTimeString('en-US', {
     hour12: false,
     hour: '2-digit',
     minute: '2-digit',
@@ -36,20 +38,18 @@ export function TradingTerminal() {
   } = useAgentAlpha({
     symbol: 'ETH/USDT',
     interval: '1h',
-    refreshInterval: 60000, // 1 minute
+    refreshInterval: 60000,
     autoRefresh: true,
   });
 
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [isClient, setIsClient] = useState(false);
 
-  // Initialize client-side only
   useEffect(() => {
     setIsClient(true);
     setLogs([{ timestamp: new Date(), agent: 'SYSTEM', message: 'BethNa AI Trader initialized' }]);
   }, []);
 
-  // Add logs when analysis updates
   useEffect(() => {
     if (analysis) {
       const newLog: LogEntry = {
@@ -57,217 +57,231 @@ export function TradingTerminal() {
         agent: 'ALPHA',
         message: `Signal: ${analysis.signal} | Confidence: ${analysis.confidence}% | ${analysis.reasoning}`,
       };
-      setLogs(prev => [...prev.slice(-50), newLog]); // Keep last 50 logs
+      setLogs(prev => [...prev.slice(-50), newLog]);
     }
   }, [analysis?.timestamp]);
 
-  // Add connection status logs
   useEffect(() => {
     const statusLog: LogEntry = {
       timestamp: new Date(),
       agent: 'SYSTEM',
-      message: isConnected ? 'Agent Alpha connected' : 'Agent Alpha disconnected - check if service is running',
+      message: isConnected ? 'Agent Alpha connected' : 'Agent Alpha disconnected',
     };
     setLogs(prev => [...prev.slice(-50), statusLog]);
   }, [isConnected]);
 
   const getAgentColor = (agent: string) => {
     switch (agent) {
-      case 'ALPHA': return 'text-info';
-      case 'BETA': return 'text-warning';
-      case 'GAMMA': return 'text-primary';
-      default: return 'text-success';
+      case 'ALPHA': return 'text-blue-500';
+      case 'BETA': return 'text-amber-500';
+      case 'GAMMA': return 'text-purple-500';
+      default: return 'text-green-500';
     }
   };
 
   const SignalIcon = analysis?.signal === 'BUY_CALL' ? TrendingUp : analysis?.signal === 'BUY_PUT' ? TrendingDown : Activity;
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="mx-auto max-w-7xl space-y-4">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <h1 className="text-3xl font-bold text-primary">
-              BethNa AI Trader
-            </h1>
-            <Badge variant={isConnected ? "default" : "destructive"} className="gap-1">
-              {isConnected ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
-              {isConnected ? 'Connected' : 'Offline'}
-            </Badge>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={refresh}
-              disabled={isLoading}
-            >
-              <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-              Refresh
-            </Button>
-            <ConnectWallet />
-          </div>
+    <div className="space-y-6">
+      {/* Header Section */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Trading Terminal</h1>
+          <p className="text-sm text-muted-foreground mt-1">Real-time AI trading system powered by BethNa</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Badge variant={isConnected ? "default" : "destructive"} className="gap-1.5 px-3 py-1.5">
+            {isConnected ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
+            {isConnected ? 'Connected' : 'Offline'}
+          </Badge>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={refresh}
+            disabled={isLoading}
+            className="gap-2"
+          >
+            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+        </div>
+      </div>
+
+      {/* Error Banner */}
+      {error && (
+        <div className="bg-destructive/20 border border-destructive/50 rounded-xl p-4 text-destructive">
+          <strong>Error:</strong> {error}
+        </div>
+      )}
+
+      {/* Main Bento Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* Chart Panel - 8 columns */}
+        <div className="lg:col-span-8">
+          <GlassCard className="overflow-hidden">
+            <div className="p-4 border-b border-border/50">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
+                    <BarChart3 className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-foreground">ETH/USDT</h2>
+                    <div className="flex items-center gap-2">
+                      {indicators && (
+                        <span className="text-2xl font-bold font-mono text-foreground">
+                          ${indicators.current_price.toLocaleString()}
+                        </span>
+                      )}
+                      {indicators && (
+                        <Badge variant="outline" className="text-success bg-success/10">
+                          +2.34%
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-1">
+                  {['1H', '4H', '1D', '1W'].map((tf) => (
+                    <button
+                      key={tf}
+                      className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${tf === '1H'
+                          ? 'bg-primary text-primary-foreground'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+                        }`}
+                    >
+                      {tf}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <TradingChart symbol="ETH/USDT" height={380} />
+          </GlassCard>
         </div>
 
-        {/* Error Banner */}
-        {error && (
-          <div className="bg-destructive/20 border border-destructive/50 rounded-lg p-4 text-destructive">
-            <strong>Error:</strong> {error}
-          </div>
-        )}
-
-        {/* Main Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* Chart Panel - Takes 2 columns on large screens */}
-          <div className="lg:col-span-2">
-            <Card className="h-[500px]">
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>ETH/USDT</span>
-                  {indicators && (
-                    <span className="text-2xl font-mono">
-                      ${indicators.current_price.toLocaleString()}
-                    </span>
-                  )}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex items-center justify-center h-[400px]">
-                {indicators ? (
-                  <div className="w-full space-y-6">
-                    {/* Price Position */}
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-muted-foreground">Bollinger Upper</span>
-                      <span className="font-mono">${indicators.bollinger_upper.toLocaleString()}</span>
-                    </div>
-
-                    {/* Visual Price Bar */}
-                    <div className="relative h-32 bg-gradient-to-t from-error/20 via-warning/20 to-success/20 rounded-lg border">
-                      <div
-                        className="absolute left-0 right-0 h-2 bg-foreground/80 rounded"
-                        style={{
-                          top: `${Math.min(95, Math.max(5, ((indicators.bollinger_upper - indicators.current_price) / (indicators.bollinger_upper - indicators.bollinger_lower)) * 100))}%`
-                        }}
-                      />
-                      <div className="absolute top-2 right-2 text-xs text-muted-foreground">
-                        Position: {indicators.price_position}
-                      </div>
-                    </div>
-
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-muted-foreground">Bollinger Lower</span>
-                      <span className="font-mono">${indicators.bollinger_lower.toLocaleString()}</span>
-                    </div>
-
-                    {/* Indicators Row */}
-                    <div className="grid grid-cols-3 gap-4 pt-4 border-t">
-                      <div className="text-center">
-                        <div className="text-xs text-muted-foreground mb-1">RSI (14)</div>
-                        <div className={`text-2xl font-mono font-bold ${getRSIColor(indicators.rsi)}`}>
-                          {indicators.rsi}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {indicators.rsi < 30 ? 'Oversold' : indicators.rsi > 70 ? 'Overbought' : 'Neutral'}
-                        </div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-xs text-muted-foreground mb-1">BB Middle</div>
-                        <div className="text-2xl font-mono font-bold">
-                          ${indicators.bollinger_middle.toLocaleString()}
-                        </div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-xs text-muted-foreground mb-1">Last Update</div>
-                        <div className="text-sm font-mono">
-                          {isClient && lastUpdate ? formatTimestamp(lastUpdate) : 'Never'}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-muted-foreground">Loading market data...</p>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Signal & Positions Panel */}
-          <div className="space-y-4">
-            {/* Trading Signal */}
-            <Card className={`border-2 ${analysis ? getSignalBgColor(analysis.signal) : ''}`}>
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2">
-                  <SignalIcon className="h-5 w-5" />
-                  Trading Signal
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {analysis ? (
-                  <div className="space-y-3">
-                    <div className={`text-3xl font-bold ${getSignalColor(analysis.signal)}`}>
-                      {analysis.signal.replace('_', ' ')}
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div>
-                        <span className="text-muted-foreground">Confidence</span>
-                        <div className="font-bold">{analysis.confidence}%</div>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Win Rate</span>
-                        <div className="font-bold">{analysis.win_rate}%</div>
-                      </div>
-                    </div>
-                    <p className="text-xs text-muted-foreground line-clamp-3">
-                      {analysis.reasoning}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="text-muted-foreground">Analyzing market...</div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Active Positions */}
-            <Card className="h-[258px]">
-              <CardHeader>
-                <CardTitle>Active Positions</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">No active positions</p>
-                  {analysis?.signal !== 'HOLD' && analysis?.confidence && analysis.confidence >= 60 && (
-                    <Button className="w-full" disabled>
-                      {analysis.signal === 'BUY_CALL' ? '📈 Execute Call Option' : '📉 Execute Put Option'}
-                    </Button>
-                  )}
+        {/* Right Side Panels - 4 columns */}
+        <div className="lg:col-span-4 space-y-4">
+          {/* Signal Card */}
+          <GlassCard className={`${analysis ? getSignalBgColor(analysis.signal) : ''}`}>
+            <div className="p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
+                  <Zap className="w-4 h-4 text-primary" />
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+                <h3 className="font-semibold text-foreground">AI Signal</h3>
+              </div>
+              {analysis ? (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className={`text-2xl font-bold ${getSignalColor(analysis.signal)}`}>
+                      {analysis.signal.replace('_', ' ')}
+                    </span>
+                    <SignalIcon className={`w-6 h-6 ${getSignalColor(analysis.signal)}`} />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-secondary/50 rounded-lg p-3">
+                      <span className="text-xs text-muted-foreground block">Confidence</span>
+                      <span className="text-lg font-bold text-foreground">{analysis.confidence}%</span>
+                    </div>
+                    <div className="bg-secondary/50 rounded-lg p-3">
+                      <span className="text-xs text-muted-foreground block">Win Rate</span>
+                      <span className="text-lg font-bold text-foreground">{analysis.win_rate}%</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground line-clamp-2">
+                    {analysis.reasoning}
+                  </p>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-24 text-muted-foreground">
+                  Analyzing market...
+                </div>
+              )}
+            </div>
+          </GlassCard>
+
+          {/* Indicators Card */}
+          <GlassCard>
+            <div className="p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-8 h-8 rounded-lg bg-accent/20 flex items-center justify-center">
+                  <Target className="w-4 h-4 text-accent" />
+                </div>
+                <h3 className="font-semibold text-foreground">Indicators</h3>
+              </div>
+              {indicators ? (
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-secondary/50 rounded-lg p-3">
+                    <span className="text-xs text-muted-foreground block">RSI (14)</span>
+                    <span className={`text-lg font-bold font-mono ${indicators.rsi < 30 ? 'text-success' : indicators.rsi > 70 ? 'text-destructive' : 'text-foreground'
+                      }`}>
+                      {indicators.rsi}
+                    </span>
+                  </div>
+                  <div className="bg-secondary/50 rounded-lg p-3">
+                    <span className="text-xs text-muted-foreground block">BB Position</span>
+                    <span className="text-lg font-bold font-mono text-foreground">
+                      {indicators.price_position}
+                    </span>
+                  </div>
+                  <div className="bg-secondary/50 rounded-lg p-3">
+                    <span className="text-xs text-muted-foreground block">BB Upper</span>
+                    <span className="text-sm font-mono text-foreground">
+                      ${indicators.bollinger_upper.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="bg-secondary/50 rounded-lg p-3">
+                    <span className="text-xs text-muted-foreground block">BB Lower</span>
+                    <span className="text-sm font-mono text-foreground">
+                      ${indicators.bollinger_lower.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-24 text-muted-foreground">
+                  Loading indicators...
+                </div>
+              )}
+            </div>
+          </GlassCard>
+        </div>
+
+        {/* Bottom Row - 3 equal panels */}
+        {/* Watchlist */}
+        <div className="lg:col-span-4">
+          <GlassCard className="h-[300px]">
+            <WatchlistPanel />
+          </GlassCard>
         </div>
 
         {/* War Room Log */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5" />
-              War Room Log
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[200px] bg-secondary rounded-md p-4 font-mono text-sm overflow-y-auto">
-              <div className="space-y-1">
-                {isClient && logs.map((log, i) => (
-                  <p key={i}>
-                    <span className="text-muted-foreground">[{formatTimestamp(log.timestamp)}]</span>{' '}
-                    <span className={getAgentColor(log.agent)}>{log.agent}:</span>{' '}
-                    <span className="text-foreground">{log.message}</span>
-                  </p>
-                ))}
+        <div className="lg:col-span-4">
+          <GlassCard className="h-[300px] flex flex-col">
+            <div className="px-4 py-3 border-b border-border/50">
+              <div className="flex items-center gap-2">
+                <Bot className="w-4 h-4 text-primary" />
+                <h3 className="text-sm font-semibold text-foreground">War Room Log</h3>
               </div>
             </div>
-          </CardContent>
-        </Card>
+            <div className="flex-1 p-3 overflow-y-auto font-mono text-xs">
+              {isClient && logs.slice(-10).map((log, i) => (
+                <div key={i} className="py-1.5 border-b border-border/20 last:border-0">
+                  <span className="text-muted-foreground">[{formatTimestamp(log.timestamp)}] </span>
+                  <span className={getAgentColor(log.agent)}>{log.agent}: </span>
+                  <span className="text-foreground/80">{log.message.slice(0, 60)}...</span>
+                </div>
+              ))}
+            </div>
+          </GlassCard>
+        </div>
+
+        {/* Alerts */}
+        <div className="lg:col-span-4">
+          <GlassCard className="h-[300px]">
+            <AlertPanel />
+          </GlassCard>
+        </div>
       </div>
     </div>
   )
