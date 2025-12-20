@@ -35,7 +35,7 @@ export function WatchlistPanel({ className, onSelectSymbol }: WatchlistPanelProp
 
     const filteredList = activeTab === 'Favorites'
         ? mockWatchlist.filter(item => item.isFavorite)
-        : mockWatchlist
+        : mockWatchlist.slice(0, 4) // Limit to 4 items for compact view
 
     const handleSelect = (symbol: string) => {
         setSelectedSymbol(symbol)
@@ -43,23 +43,23 @@ export function WatchlistPanel({ className, onSelectSymbol }: WatchlistPanelProp
     }
 
     return (
-        <div className={cn('flex flex-col h-full', className)}>
+        <div className={cn('flex flex-col h-full overflow-hidden', className)}>
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-border/50">
+            <div className="flex items-center justify-between px-3 py-2 border-b border-border/50 flex-shrink-0">
                 <h3 className="text-sm font-semibold text-foreground">Watchlist</h3>
-                <button className="p-1.5 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors">
+                <button className="p-1 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors">
                     <Plus className="w-4 h-4" />
                 </button>
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-1 px-3 py-2 border-b border-border/30">
+            <div className="flex gap-1 px-2 py-1.5 border-b border-border/30 flex-shrink-0">
                 {tabs.map((tab) => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
                         className={cn(
-                            'px-3 py-1.5 text-xs font-medium rounded-lg transition-all',
+                            'px-2 py-1 text-xs font-medium rounded-lg transition-all',
                             activeTab === tab
                                 ? 'bg-primary text-primary-foreground'
                                 : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
@@ -71,56 +71,56 @@ export function WatchlistPanel({ className, onSelectSymbol }: WatchlistPanelProp
             </div>
 
             {/* Table Header */}
-            <div className="flex items-center justify-between px-4 py-2 text-xs text-muted-foreground border-b border-border/30">
+            <div className="flex items-center justify-between px-3 py-1.5 text-[10px] text-muted-foreground border-b border-border/30 flex-shrink-0">
                 <span className="flex-1">Symbol</span>
                 <span className="w-20 text-right">Price</span>
-                <span className="w-16 text-right">Change</span>
+                <span className="w-14 text-right">Change</span>
             </div>
 
-            {/* Watchlist Items */}
-            <div className="flex-1 overflow-y-auto">
+            {/* Watchlist Items - scrollable */}
+            <div className="flex-1 overflow-y-auto min-h-0">
                 {filteredList.map((item) => (
                     <button
                         key={item.symbol}
                         onClick={() => handleSelect(item.symbol)}
                         className={cn(
-                            'w-full flex items-center justify-between px-4 py-3 text-left transition-all',
+                            'w-full flex items-center justify-between px-3 py-2 text-left transition-all',
                             'hover:bg-secondary/50 group',
                             selectedSymbol === item.symbol && 'bg-primary/10 border-l-2 border-primary'
                         )}
                     >
-                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
                             <div className={cn(
-                                'w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold',
+                                'w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold',
                                 item.change >= 0 ? 'bg-success/20 text-success' : 'bg-destructive/20 text-destructive'
                             )}>
                                 {item.symbol.slice(0, 2)}
                             </div>
                             <div className="min-w-0">
-                                <div className="flex items-center gap-1.5">
-                                    <span className="font-medium text-foreground truncate">{item.symbol}</span>
+                                <div className="flex items-center gap-1">
+                                    <span className="text-sm font-medium text-foreground truncate">{item.symbol}</span>
                                     {item.isFavorite && (
-                                        <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                                        <Star className="w-2.5 h-2.5 text-yellow-500 fill-yellow-500" />
                                     )}
                                 </div>
-                                <span className="text-xs text-muted-foreground truncate">{item.name}</span>
+                                <span className="text-[10px] text-muted-foreground truncate">{item.name}</span>
                             </div>
                         </div>
 
                         <div className="w-20 text-right">
-                            <span className="text-sm font-medium text-foreground">
+                            <span className="text-xs font-medium text-foreground">
                                 ${item.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                             </span>
                         </div>
 
-                        <div className="w-16 flex items-center justify-end gap-1">
+                        <div className="w-14 flex items-center justify-end gap-0.5">
                             {item.change >= 0 ? (
-                                <TrendingUp className="w-3 h-3 text-success" />
+                                <TrendingUp className="w-2.5 h-2.5 text-success" />
                             ) : (
-                                <TrendingDown className="w-3 h-3 text-destructive" />
+                                <TrendingDown className="w-2.5 h-2.5 text-destructive" />
                             )}
                             <span className={cn(
-                                'text-xs font-medium',
+                                'text-[10px] font-medium',
                                 item.change >= 0 ? 'text-success' : 'text-destructive'
                             )}>
                                 {item.changePercent >= 0 ? '+' : ''}{item.changePercent.toFixed(2)}%
@@ -131,7 +131,7 @@ export function WatchlistPanel({ className, onSelectSymbol }: WatchlistPanelProp
             </div>
 
             {/* Footer */}
-            <div className="px-4 py-3 border-t border-border/50">
+            <div className="px-3 py-2 border-t border-border/50 flex-shrink-0">
                 <button className="w-full flex items-center justify-center gap-1 text-xs text-primary hover:text-primary/80 transition-colors">
                     View All Assets
                     <ChevronRight className="w-3 h-3" />

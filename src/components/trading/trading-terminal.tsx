@@ -146,8 +146,8 @@ export function TradingTerminal() {
                     <button
                       key={tf}
                       className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${tf === '1H'
-                          ? 'bg-primary text-primary-foreground'
-                          : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
                         }`}
                     >
                       {tf}
@@ -247,29 +247,29 @@ export function TradingTerminal() {
           </GlassCard>
         </div>
 
-        {/* Bottom Row - 3 equal panels */}
+        {/* Bottom Row - 4 equal panels for better spacing */}
         {/* Watchlist */}
-        <div className="lg:col-span-4">
-          <GlassCard className="h-[300px]">
+        <div className="lg:col-span-3">
+          <GlassCard className="h-[260px] overflow-hidden">
             <WatchlistPanel />
           </GlassCard>
         </div>
 
         {/* War Room Log */}
-        <div className="lg:col-span-4">
-          <GlassCard className="h-[300px] flex flex-col">
-            <div className="px-4 py-3 border-b border-border/50">
+        <div className="lg:col-span-3">
+          <GlassCard className="h-[260px] overflow-hidden flex flex-col">
+            <div className="px-3 py-2 border-b border-border/50 flex-shrink-0">
               <div className="flex items-center gap-2">
                 <Bot className="w-4 h-4 text-primary" />
                 <h3 className="text-sm font-semibold text-foreground">War Room Log</h3>
               </div>
             </div>
-            <div className="flex-1 p-3 overflow-y-auto font-mono text-xs">
-              {isClient && logs.slice(-10).map((log, i) => (
-                <div key={i} className="py-1.5 border-b border-border/20 last:border-0">
+            <div className="flex-1 p-2 overflow-y-auto font-mono text-[11px] min-h-0">
+              {isClient && logs.slice(-6).map((log, i) => (
+                <div key={i} className="py-1 border-b border-border/20 last:border-0">
                   <span className="text-muted-foreground">[{formatTimestamp(log.timestamp)}] </span>
                   <span className={getAgentColor(log.agent)}>{log.agent}: </span>
-                  <span className="text-foreground/80">{log.message.slice(0, 60)}...</span>
+                  <span className="text-foreground/80 break-words">{log.message.slice(0, 40)}...</span>
                 </div>
               ))}
             </div>
@@ -277,9 +277,39 @@ export function TradingTerminal() {
         </div>
 
         {/* Alerts */}
-        <div className="lg:col-span-4">
-          <GlassCard className="h-[300px]">
+        <div className="lg:col-span-3">
+          <GlassCard className="h-[260px] overflow-hidden">
             <AlertPanel />
+          </GlassCard>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="lg:col-span-3">
+          <GlassCard className="h-[260px] p-4 flex flex-col">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 rounded-lg bg-success/20 flex items-center justify-center">
+                <Activity className="w-4 h-4 text-success" />
+              </div>
+              <h3 className="text-sm font-semibold text-foreground">Quick Stats</h3>
+            </div>
+            <div className="flex-1 grid grid-cols-2 gap-2">
+              <div className="bg-secondary/50 rounded-lg p-3 flex flex-col justify-center">
+                <span className="text-xs text-muted-foreground">Today's P&L</span>
+                <span className="text-lg font-bold text-success">+$1,234</span>
+              </div>
+              <div className="bg-secondary/50 rounded-lg p-3 flex flex-col justify-center">
+                <span className="text-xs text-muted-foreground">Win Rate</span>
+                <span className="text-lg font-bold text-foreground">73.2%</span>
+              </div>
+              <div className="bg-secondary/50 rounded-lg p-3 flex flex-col justify-center">
+                <span className="text-xs text-muted-foreground">Total Trades</span>
+                <span className="text-lg font-bold text-foreground">24</span>
+              </div>
+              <div className="bg-secondary/50 rounded-lg p-3 flex flex-col justify-center">
+                <span className="text-xs text-muted-foreground">Open Positions</span>
+                <span className="text-lg font-bold text-primary">3</span>
+              </div>
+            </div>
           </GlassCard>
         </div>
       </div>
