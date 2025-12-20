@@ -9,11 +9,20 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
-    <div className="min-h-screen bg-background text-foreground flex">
+    <div className="min-h-screen bg-background text-foreground">
+      {/* Subtle gradient overlay */}
+      <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+
+      {/* Sidebar - floating on left with padding */}
       <DashboardSidebar />
-      <div className="flex-1 flex flex-col">
+
+      {/* Main Content - offset by sidebar width + gap */}
+      <div className="ml-[96px] flex flex-col min-h-screen relative">
+        {/* Header */}
         <DashboardHeader />
-        <main className="flex-1 p-6">
+
+        {/* Page Content */}
+        <main className="flex-1 px-6 pb-6">
           {children}
         </main>
       </div>
