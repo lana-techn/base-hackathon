@@ -32,7 +32,7 @@ export const TIME_CONSTANTS = {
 
 // API Endpoints
 export const API_ENDPOINTS = {
-  BINANCE_BASE: 'https://api.binance.com/api/v3',
+  COINGECKO_BASE: 'https://api.coingecko.com/api/v3',
   THETANUTS_BASE: 'https://api.thetanuts.finance/v1',
   TWITTER_BASE: 'https://api.twitter.com/2',
   FARCASTER_BASE: 'https://api.farcaster.xyz/v2',

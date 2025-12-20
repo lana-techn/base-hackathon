@@ -11,7 +11,7 @@ from datetime import datetime
 import os
 from dotenv import load_dotenv
 
-from services.binance import BinanceService
+from services.coingecko import CoinGeckoService
 from services.indicators import calculate_rsi, calculate_bollinger_bands
 from services.signals import SignalGenerator, TradingSignal
 
@@ -33,7 +33,7 @@ app.add_middleware(
 )
 
 # Initialize services
-binance_service = BinanceService()
+coingecko_service = CoinGeckoService(api_key=os.getenv('COINGECKO_API_KEY'))
 signal_generator = SignalGenerator()
 
 
@@ -94,14 +94,16 @@ async def get_candles(
     limit: int = 720
 ):
     """
-    Fetch historical candlestick data from Binance
+    Fetch historical candlestick data from CoinGecko
     
     - symbol: Trading pair (default: ETH/USDT)
-    - interval: Candle interval (1m, 5m, 15m, 1h, 4h, 1d)
-    - limit: Number of candles to fetch (max 720 for 30 days of hourly data)
+    - interval: Candle interval (not used, CoinGecko uses days)
+    - limit: Number of candles to fetch
     """
     try:
-        candles = await binance_service.fetch_ohlcv(symbol, interval, limit)
+        # Convert limit to days (CoinGecko uses days parameter)
+        days = min(max(limit // 24, 1), 365)  # Convert hours to days, max 365
+        candles = await coingecko_service.fetch_ohlc(symbol, days)
         return CandlesResponse(
             symbol=symbol,
             interval=interval,
@@ -112,7 +114,7 @@ async def get_candles(
                     high=c[2],
                     low=c[3],
                     close=c[4],
-                    volume=c[5]
+                    volume=c[5] if len(c) > 5 else 0
                 ) for c in candles
             ],
             count=len(candles)
@@ -130,15 +132,15 @@ async def get_indicators(
     Get current technical indicators for a symbol
     """
     try:
-        # Fetch enough data for indicator calculations
-        candles = await binance_service.fetch_ohlcv(symbol, interval, 100)
+        # Fetch enough data for indicator calculations (30 days)
+        candles = await coingecko_service.fetch_ohlc(symbol, days=30)
         closes = [c[4] for c in candles]  # Close prices
         
         # Calculate indicators
         rsi = calculate_rsi(closes, period=14)
         bb_upper, bb_middle, bb_lower = calculate_bollinger_bands(closes, period=20, std_dev=2)
         
-        current_price = closes[-1]
+        current_price = closes[-1] if closes else 0
         
         # Determine price position relative to Bollinger Bands
         if current_price >= bb_upper:
@@ -174,8 +176,8 @@ async def analyze_market(
     - Otherwise → HOLD
     """
     try:
-        # Fetch historical data for backtesting (720 hours = 30 days)
-        candles = await binance_service.fetch_ohlcv(symbol, interval, 720)
+        # Fetch historical data for backtesting (30 days)
+        candles = await coingecko_service.fetch_ohlc(symbol, days=30)
         
         # Generate signal with backtesting
         signal = signal_generator.generate_signal(candles)

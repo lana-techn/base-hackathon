@@ -88,23 +88,40 @@ export interface ContractConfig {
   chainId: number
 }
 
-// API Response Types
-export interface BinanceKlineResponse {
+// API Response Types - CoinGecko
+export interface CoinGeckoOHLCResponse {
+  timestamp: number
+  open: number
+  high: number
+  low: number
+  close: number
+}
+
+export interface CoinGeckoPriceResponse {
+  [coinId: string]: {
+    usd: number
+    usd_24h_change: number
+    usd_24h_vol: number
+    usd_market_cap: number
+  }
+}
+
+export interface CoinGeckoMarketData {
+  id: string
   symbol: string
-  data: Array<[
-    number, // Open time
-    string, // Open price
-    string, // High price
-    string, // Low price
-    string, // Close price
-    string, // Volume
-    number, // Close time
-    string, // Quote asset volume
-    number, // Number of trades
-    string, // Taker buy base asset volume
-    string, // Taker buy quote asset volume
-    string  // Ignore
-  ]>
+  name: string
+  current_price: number
+  market_cap: number
+  market_cap_rank: number
+  total_volume: number
+  high_24h: number
+  low_24h: number
+  price_change_24h: number
+  price_change_percentage_24h: number
+  circulating_supply: number
+  ath: number
+  ath_change_percentage: number
+  atl: number
 }
 
 export interface ThetanutsOptionData {

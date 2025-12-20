@@ -1,76 +1,57 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getIndicators, getMarketData } from '@/lib/coingecko'
 
-// Mock analysis generator
-function generateMockAnalysis(symbol: string = 'ETH/USDT') {
-  const basePrices: Record<string, number> = {
-    'ETH/USDT': 3200,
-    'BTC/USDT': 65000,
-    'SOL/USDT': 180,
-    'MATIC/USDT': 0.85
-  }
-  
-  const basePrice = basePrices[symbol] || 3200
-  const variation = basePrice * 0.05
-  
-  const currentPrice = basePrice + (Math.random() - 0.5) * variation
-  const rsi = 20 + Math.random() * 60 // RSI between 20-80
-  
-  const bbMiddle = currentPrice * (0.98 + Math.random() * 0.04)
-  const bbUpper = bbMiddle * 1.02
-  const bbLower = bbMiddle * 0.98
+// Extract coin symbol from trading pair (e.g., "ETH/USDT" -> "ETH")
+function extractCoinSymbol(pair: string): string {
+  return pair.split('/')[0].toUpperCase()
+}
+
+// Generate trading signal based on real indicators
+function generateSignal(indicators: {
+  rsi: number
+  bollinger_upper: number
+  bollinger_middle: number
+  bollinger_lower: number
+  current_price: number
+  price_change_24h: number
+  price_position: 'UPPER' | 'MIDDLE' | 'LOWER'
+}) {
+  const { rsi, bollinger_upper, bollinger_lower, current_price, price_change_24h, price_position } = indicators
   
   let signal: 'BUY_CALL' | 'BUY_PUT' | 'HOLD' | 'CLOSE_POSITION'
   let confidence: number
   let reasoning: string
   
-  // Trading strategy implementation
-  if (currentPrice < bbLower && rsi < 30) {
+  // Trading strategy based on real data
+  if (current_price < bollinger_lower && rsi < 30) {
     signal = 'BUY_CALL'
     confidence = Math.min(90, 60 + (30 - rsi))
-    reasoning = `Strong oversold signal: Price $${currentPrice} below Bollinger Lower $${bbLower} with RSI ${rsi.toFixed(1)}`
-  } else if (currentPrice > bbUpper && rsi > 70) {
+    reasoning = `Strong oversold signal: Price $${current_price.toFixed(2)} below Bollinger Lower $${bollinger_lower.toFixed(2)} with RSI ${rsi.toFixed(1)}. 24h change: ${price_change_24h.toFixed(2)}%`
+  } else if (current_price > bollinger_upper && rsi > 70) {
     signal = 'BUY_PUT'
     confidence = Math.min(90, 60 + (rsi - 70))
-    reasoning = `Strong overbought signal: Price $${currentPrice} above Bollinger Upper $${bbUpper} with RSI ${rsi.toFixed(1)}`
-  } else if (currentPrice < bbLower || rsi < 35) {
+    reasoning = `Strong overbought signal: Price $${current_price.toFixed(2)} above Bollinger Upper $${bollinger_upper.toFixed(2)} with RSI ${rsi.toFixed(1)}. 24h change: ${price_change_24h.toFixed(2)}%`
+  } else if (price_position === 'LOWER' || rsi < 35) {
     signal = 'BUY_CALL'
     confidence = 45 + Math.random() * 20
-    reasoning = `Moderate oversold: Price $${currentPrice}, RSI ${rsi.toFixed(1)}. Potential bounce opportunity.`
-  } else if (currentPrice > bbUpper || rsi > 65) {
+    reasoning = `Moderate oversold: Price $${current_price.toFixed(2)}, RSI ${rsi.toFixed(1)}. Potential bounce opportunity.`
+  } else if (price_position === 'UPPER' || rsi > 65) {
     signal = 'BUY_PUT'
     confidence = 45 + Math.random() * 20
-    reasoning = `Moderate overbought: Price $${currentPrice}, RSI ${rsi.toFixed(1)}. Potential correction.`
+    reasoning = `Moderate overbought: Price $${current_price.toFixed(2)}, RSI ${rsi.toFixed(1)}. Potential correction.`
   } else {
     signal = 'HOLD'
     confidence = 30 + Math.random() * 30
-    reasoning = `Neutral market: Price $${currentPrice} in middle range, RSI ${rsi.toFixed(1)}. Waiting for clearer signal.`
+    reasoning = `Neutral market: Price $${current_price.toFixed(2)} in middle range, RSI ${rsi.toFixed(1)}. Waiting for clearer signal.`
   }
   
   const winRate = Math.max(45, confidence - 5 + Math.random() * 10)
-  
-  let pricePosition: 'UPPER' | 'MIDDLE' | 'LOWER'
-  if (currentPrice >= bbUpper) {
-    pricePosition = 'UPPER'
-  } else if (currentPrice <= bbLower) {
-    pricePosition = 'LOWER'
-  } else {
-    pricePosition = 'MIDDLE'
-  }
   
   return {
     signal,
     confidence: Math.round(confidence),
     win_rate: Math.round(winRate),
     reasoning,
-    indicators: {
-      rsi: Math.round(rsi * 100) / 100,
-      bollinger_upper: Math.round(bbUpper * 100) / 100,
-      bollinger_middle: Math.round(bbMiddle * 100) / 100,
-      bollinger_lower: Math.round(bbLower * 100) / 100,
-      current_price: Math.round(currentPrice * 100) / 100,
-      price_position: pricePosition
-    },
-    timestamp: new Date().toISOString()
   }
 }
 
@@ -78,13 +59,28 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const symbol = searchParams.get('symbol') || 'ETH/USDT'
-    const interval = searchParams.get('interval') || '1h'
     
-    // In production, this would run backtesting analysis
-    // For now, return mock analysis
-    const analysis = generateMockAnalysis(symbol)
+    // Extract base coin (e.g., ETH from ETH/USDT)
+    const coinSymbol = extractCoinSymbol(symbol)
     
-    return NextResponse.json(analysis)
+    // Fetch real indicators from CoinGecko
+    const indicators = await getIndicators(coinSymbol)
+    
+    // Generate trading signal based on real data
+    const signalData = generateSignal(indicators)
+    
+    return NextResponse.json({
+      ...signalData,
+      indicators: {
+        rsi: indicators.rsi,
+        bollinger_upper: indicators.bollinger_upper,
+        bollinger_middle: indicators.bollinger_middle,
+        bollinger_lower: indicators.bollinger_lower,
+        current_price: indicators.current_price,
+        price_position: indicators.price_position,
+      },
+      timestamp: new Date().toISOString()
+    })
   } catch (error) {
     console.error('Error in analyze API:', error)
     return NextResponse.json(
