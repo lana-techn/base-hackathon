@@ -2,6 +2,7 @@
 
 import { cn } from '@/lib/utils'
 import {
+  Home,
   LayoutDashboard,
   LineChart,
   Bell,
@@ -22,6 +23,7 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
+  { icon: <Home className="w-5 h-5" />, label: 'Home', href: '/' },
   { icon: <LayoutDashboard className="w-5 h-5" />, label: 'Dashboard', href: '/dashboard' },
   { icon: <LineChart className="w-5 h-5" />, label: 'Trading', href: '/dashboard/trading' },
   { icon: <Bot className="w-5 h-5" />, label: 'AI Agents', href: '/dashboard/agents' },
