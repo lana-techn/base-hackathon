@@ -1,7 +1,7 @@
 'use client'
 
 import { Search, Bell, Wifi } from 'lucide-react'
-import { ConnectWallet } from '@coinbase/onchainkit/wallet'
+import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 
 export function DashboardHeader() {
@@ -40,9 +40,7 @@ export function DashboardHeader() {
         </div>
 
         {/* Wallet */}
-        <div className="[&_button]:rounded-2xl [&_button]:h-11 [&_button]:px-5 [&_button]:text-sm [&_button]:font-medium [&_button]:shadow-sm">
-          <ConnectWallet />
-        </div>
+        <ConnectButton />
       </div>
     </header>
   )

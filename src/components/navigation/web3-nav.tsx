@@ -7,7 +7,7 @@ import { GlassCard } from "@/components/ui/glass-card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
-import { ConnectWallet } from '@coinbase/onchainkit/wallet'
+import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { 
   Home, 
   BarChart3, 
@@ -218,7 +218,7 @@ const Web3Nav = ({
 
                       {/* Wallet Connection */}
                       <div className="pt-4">
-                        <ConnectWallet />
+                        <ConnectButton />
                       </div>
                     </div>
                   </div>
@@ -250,7 +250,7 @@ const Web3Nav = ({
             <ThemeToggle />
 
             {/* Wallet */}
-            <ConnectWallet />
+            <ConnectButton />
           </div>
         </GlassCard>
       </div>
