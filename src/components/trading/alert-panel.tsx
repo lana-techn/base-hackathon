@@ -83,7 +83,7 @@ const formatTime = (date: Date) => {
 
 export function AlertPanel({ className, alerts = mockAlerts }: AlertPanelProps) {
     return (
-        <div className={cn('flex flex-col h-full overflow-hidden', className)}>
+        <div className={cn('flex flex-col h-full', className)}>
             {/* Header */}
             <div className="flex items-center justify-between px-3 py-2 border-b border-border/50 flex-shrink-0">
                 <div className="flex items-center gap-2">
@@ -109,8 +109,8 @@ export function AlertPanel({ className, alerts = mockAlerts }: AlertPanelProps) 
             </div>
 
             {/* Alerts List - scrollable */}
-            <div className="flex-1 overflow-y-auto min-h-0">
-                {alerts.slice(0, 3).map((alert) => (
+            <div className="flex-1 overflow-y-auto min-h-0 scrollbar-thin">
+                {alerts.map((alert) => (
                     <div
                         key={alert.id}
                         className="flex items-start gap-2 px-3 py-2 border-b border-border/20 hover:bg-secondary/30 transition-colors cursor-pointer"
