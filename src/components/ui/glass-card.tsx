@@ -54,9 +54,9 @@ const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
       >
         {/* Gradient overlay for depth */}
         <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/5 to-transparent dark:from-white/5 dark:to-transparent pointer-events-none" />
-        
-        {/* Content */}
-        <div className="relative z-10">
+
+        {/* Content - passes through full height for scroll containers */}
+        <div className="relative z-10 h-full flex flex-col">
           {children}
         </div>
       </div>
@@ -99,7 +99,7 @@ const Web3Card = forwardRef<HTMLDivElement, Web3CardProps>(
           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
           </div>
-          
+
           {/* Content */}
           <div className="relative z-10">
             {children}

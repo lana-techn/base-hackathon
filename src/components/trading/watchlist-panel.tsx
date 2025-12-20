@@ -35,7 +35,7 @@ export function WatchlistPanel({ className, onSelectSymbol }: WatchlistPanelProp
 
     const filteredList = activeTab === 'Favorites'
         ? mockWatchlist.filter(item => item.isFavorite)
-        : mockWatchlist.slice(0, 4) // Limit to 4 items for compact view
+        : mockWatchlist // Show all items with scroll
 
     const handleSelect = (symbol: string) => {
         setSelectedSymbol(symbol)
@@ -43,7 +43,7 @@ export function WatchlistPanel({ className, onSelectSymbol }: WatchlistPanelProp
     }
 
     return (
-        <div className={cn('flex flex-col h-full overflow-hidden', className)}>
+        <div className={cn('flex flex-col h-full', className)}>
             {/* Header */}
             <div className="flex items-center justify-between px-3 py-2 border-b border-border/50 flex-shrink-0">
                 <h3 className="text-sm font-semibold text-foreground">Watchlist</h3>
@@ -78,7 +78,7 @@ export function WatchlistPanel({ className, onSelectSymbol }: WatchlistPanelProp
             </div>
 
             {/* Watchlist Items - scrollable */}
-            <div className="flex-1 overflow-y-auto min-h-0">
+            <div className="flex-1 overflow-y-auto min-h-0 scrollbar-thin">
                 {filteredList.map((item) => (
                     <button
                         key={item.symbol}

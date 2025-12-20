@@ -8,7 +8,8 @@ import { useAgentAlpha, getSignalColor, getSignalBgColor } from "@/hooks/useAgen
 import { TradingChart } from "./trading-chart"
 import { WatchlistPanel } from "./watchlist-panel"
 import { AlertPanel } from "./alert-panel"
-import { RefreshCw, TrendingUp, TrendingDown, Activity, Wifi, WifiOff, Zap, Target, BarChart3, Bot } from "lucide-react"
+import { OptionsChain } from "./options-chain"
+import { RefreshCw, TrendingUp, TrendingDown, Activity, Wifi, WifiOff, Zap, Target, BarChart3, Bot, LayoutGrid } from "lucide-react"
 import { useState, useEffect } from "react"
 
 interface LogEntry {
@@ -44,6 +45,7 @@ export function TradingTerminal() {
 
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [isClient, setIsClient] = useState(false);
+  const [viewMode, setViewMode] = useState<'chart' | 'options'>('chart');
 
   useEffect(() => {
     setIsClient(true);
@@ -141,22 +143,52 @@ export function TradingTerminal() {
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-1">
-                  {['1H', '4H', '1D', '1W'].map((tf) => (
+                <div className="flex items-center gap-2">
+                  {/* View Toggle */}
+                  <div className="flex gap-1 mr-2 p-1 bg-secondary/50 rounded-lg">
+                    <button
+                      onClick={() => setViewMode('chart')}
+                      className={`px-2 py-1 text-xs font-medium rounded transition-colors flex items-center gap-1 ${viewMode === 'chart'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                    >
+                      <BarChart3 className="w-3 h-3" />
+                      Chart
+                    </button>
+                    <button
+                      onClick={() => setViewMode('options')}
+                      className={`px-2 py-1 text-xs font-medium rounded transition-colors flex items-center gap-1 ${viewMode === 'options'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                    >
+                      <LayoutGrid className="w-3 h-3" />
+                      Options
+                    </button>
+                  </div>
+                  {/* Timeframe buttons - only show on chart view */}
+                  {viewMode === 'chart' && (['1H', '4H', '1D', '1W'].map((tf) => (
                     <button
                       key={tf}
                       className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${tf === '1H'
-                        ? 'bg-primary text-primary-foreground'
+                        ? 'bg-secondary text-foreground'
                         : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
                         }`}
                     >
                       {tf}
                     </button>
-                  ))}
+                  )))}
                 </div>
               </div>
             </div>
-            <TradingChart symbol="ETH/USDT" height={380} />
+            {viewMode === 'chart' ? (
+              <TradingChart symbol="ETH/USDT" height={380} />
+            ) : (
+              <div className="h-[380px]">
+                <OptionsChain asset="ETH" className="h-full" />
+              </div>
+            )}
           </GlassCard>
         </div>
 
@@ -250,22 +282,22 @@ export function TradingTerminal() {
         {/* Bottom Row - 4 equal panels for better spacing */}
         {/* Watchlist */}
         <div className="lg:col-span-3">
-          <GlassCard className="h-[260px] overflow-hidden">
-            <WatchlistPanel />
+          <GlassCard className="h-[260px]">
+            <WatchlistPanel className="flex-1 min-h-0" />
           </GlassCard>
         </div>
 
         {/* War Room Log */}
         <div className="lg:col-span-3">
-          <GlassCard className="h-[260px] overflow-hidden flex flex-col">
+          <GlassCard className="h-[260px]">
             <div className="px-3 py-2 border-b border-border/50 flex-shrink-0">
               <div className="flex items-center gap-2">
                 <Bot className="w-4 h-4 text-primary" />
                 <h3 className="text-sm font-semibold text-foreground">War Room Log</h3>
               </div>
             </div>
-            <div className="flex-1 p-2 overflow-y-auto font-mono text-[11px] min-h-0">
-              {isClient && logs.slice(-6).map((log, i) => (
+            <div className="flex-1 p-2 overflow-y-auto font-mono text-[11px] min-h-0 scrollbar-thin">
+              {isClient && logs.slice(-20).map((log, i) => (
                 <div key={i} className="py-1 border-b border-border/20 last:border-0">
                   <span className="text-muted-foreground">[{formatTimestamp(log.timestamp)}] </span>
                   <span className={getAgentColor(log.agent)}>{log.agent}: </span>
@@ -278,8 +310,8 @@ export function TradingTerminal() {
 
         {/* Alerts */}
         <div className="lg:col-span-3">
-          <GlassCard className="h-[260px] overflow-hidden">
-            <AlertPanel />
+          <GlassCard className="h-[260px]">
+            <AlertPanel className="flex-1 min-h-0" />
           </GlassCard>
         </div>
 
