@@ -13,14 +13,20 @@ const nextConfig: NextConfig = {
   // Empty config to silence the Turbopack vs webpack conflict warning
   turbopack: {},
 
-  // Webpack configuration to handle WalletConnect/pino dependencies
+  // Webpack configuration to handle WalletConnect/pino/MetaMask dependencies
   webpack: (config, { isServer }) => {
-    // Fix for thread-stream test files that try to import test utilities
+    // Fallbacks for optional dependencies that cause warnings
     config.resolve.fallback = {
       ...config.resolve.fallback,
+      // thread-stream test utilities
       'tap': false,
       'tape': false,
       'why-is-node-running': false,
+      // pino optional dependencies
+      'pino-pretty': false,
+      // MetaMask SDK React Native dependencies (not needed for web)
+      '@react-native-async-storage/async-storage': false,
+      'react-native': false,
     };
 
     // Ignore test files from thread-stream package
@@ -30,6 +36,15 @@ const nextConfig: NextConfig = {
       test: /node_modules[\\/]thread-stream[\\/]test[\\/]/,
       use: 'null-loader',
     });
+
+    // Suppress specific warnings
+    config.ignoreWarnings = [
+      ...(config.ignoreWarnings || []),
+      // Ignore pino-pretty and async-storage warnings
+      /Can't resolve 'pino-pretty'/,
+      /Can't resolve '@react-native-async-storage/,
+      /Can't resolve 'react-native'/,
+    ];
 
     return config;
   },

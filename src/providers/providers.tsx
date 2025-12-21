@@ -1,31 +1,20 @@
 'use client'
 
-import '@rainbow-me/rainbowkit/styles.css'
-import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { WagmiProvider } from 'wagmi'
-import { config } from '@/config/wagmi'
-import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import { ThemeProvider } from '@/components/ui/theme-provider'
 
-export function Providers({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient())
+// Dynamically import Web3Provider with SSR disabled to avoid indexedDB errors
+const Web3Provider = dynamic(
+  () => import('./web3-provider').then(mod => mod.Web3Provider),
+  { ssr: false }
+)
 
+export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider>
-      <WagmiProvider config={config}>
-        <QueryClientProvider client={queryClient}>
-          <RainbowKitProvider
-            theme={darkTheme({
-              accentColor: '#22c55e',
-              accentColorForeground: 'white',
-              borderRadius: 'medium',
-            })}
-          >
-            {children}
-          </RainbowKitProvider>
-        </QueryClientProvider>
-      </WagmiProvider>
+      <Web3Provider>
+        {children}
+      </Web3Provider>
     </ThemeProvider>
   )
 }
