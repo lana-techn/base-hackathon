@@ -28,6 +28,9 @@ export const TIME_CONSTANTS = {
   ANALYSIS_INTERVAL: 60 * 60 * 1000, // 1 hour
   DATA_RETENTION_HOURS: 720, // 30 days
   WEBSOCKET_RECONNECT_DELAY: 5000,
+  PRICE_UPDATE_INTERVAL: 1000, // 1 second for real-time prices
+  ALERT_CHECK_INTERVAL: 5000, // 5 seconds for alert checking
+  HEARTBEAT_INTERVAL: 30000, // 30 seconds for WebSocket heartbeat
 } as const
 
 // API Endpoints
@@ -36,6 +39,10 @@ export const API_ENDPOINTS = {
   THETANUTS_BASE: 'https://api.thetanuts.finance/v1',
   TWITTER_BASE: 'https://api.twitter.com/2',
   FARCASTER_BASE: 'https://api.farcaster.xyz/v2',
+  BINANCE_WS: 'wss://stream.binance.com:9443/ws',
+  BINANCE_API: 'https://api.binance.com/api/v3',
+  COINBASE_WS: 'wss://ws-feed.exchange.coinbase.com',
+  KRAKEN_WS: 'wss://ws.kraken.com',
 } as const
 
 // Default Agent Configuration
@@ -91,6 +98,26 @@ export const SOCIAL_CONSTANTS = {
 export const TOKEN_ADDRESSES = {
   USDC: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
   WETH: '0x4200000000000000000000000000000000000006',
+} as const
+
+// WebSocket Configuration
+export const WEBSOCKET_CONFIG = {
+  MAX_RECONNECT_ATTEMPTS: 5,
+  RECONNECT_DELAY: 1000,
+  CONNECTION_TIMEOUT: 10000,
+  HEARTBEAT_INTERVAL: 30000,
+  MAX_BUFFER_SIZE: 1000,
+  PRICE_STREAM_SYMBOLS: ['ETHUSDT', 'BTCUSDT', 'SOLUSDT', 'MATICUSDT'],
+} as const
+
+// Alert Configuration
+export const ALERT_CONFIG = {
+  MAX_PRICE_ALERTS: 50,
+  MAX_SIGNAL_ALERTS: 100,
+  MAX_NOTIFICATIONS: 200,
+  NOTIFICATION_TIMEOUT: 5000,
+  HIGH_CONFIDENCE_THRESHOLD: 80,
+  MEDIUM_CONFIDENCE_THRESHOLD: 70,
 } as const
 
 // Gas Configuration
