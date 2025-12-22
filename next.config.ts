@@ -49,6 +49,20 @@ const nextConfig: NextConfig = {
     return config;
   },
 
+  // Headers for CORS and security
+  async headers() {
+    return [
+      {
+        source: '/api/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET, POST, PUT, DELETE, OPTIONS' },
+          { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization' },
+        ],
+      },
+    ]
+  },
+
   // Ensure proper handling of API routes
   async rewrites() {
     return [
@@ -56,7 +70,19 @@ const nextConfig: NextConfig = {
         source: '/api/:path*',
         destination: '/api/:path*',
       },
+      // Proxy Thetanuts API to avoid CORS
+      {
+        source: '/api/thetanuts/:path*',
+        destination: 'https://round-snowflake-9c31.devops-118.workers.dev/:path*',
+      },
     ]
+  },
+
+  // Remove console logs in production
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn']
+    } : false,
   },
 };
 

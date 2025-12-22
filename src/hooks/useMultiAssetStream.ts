@@ -14,7 +14,7 @@ export interface AssetPrice {
 
 export interface MultiAssetStreamConfig {
   symbols: string[]
-  exchange?: 'binance' | 'coinbase' | 'kraken'
+  exchange?: 'coinbase' | 'kraken' | 'coingecko'
   updateInterval?: number
   autoReconnect?: boolean
 }
@@ -31,7 +31,7 @@ export interface UseMultiAssetStreamReturn {
 
 export function useMultiAssetStream({
   symbols = [],
-  exchange = 'binance'
+  exchange = 'coinbase'
 }: MultiAssetStreamConfig): UseMultiAssetStreamReturn {
   const [prices, setPrices] = useState<Record<string, AssetPrice>>({})
   const [isConnected, setIsConnected] = useState(false)
@@ -43,31 +43,36 @@ export function useMultiAssetStream({
 
   const getWebSocketUrl = useCallback((exchange: string, symbol: string): string => {
     switch (exchange) {
-      case 'binance':
-        return `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@ticker`
       case 'coinbase':
-        return `wss://ws-feed.exchange.coinbase.com`
+        return `wss://demo-coinbase-${symbol.toLowerCase()}`
       case 'kraken':
-        return `wss://ws.kraken.com`
+        return `wss://demo-kraken-${symbol.toLowerCase()}`
+      case 'coingecko':
+        return `wss://demo-coingecko-${symbol.toLowerCase()}`
       default:
-        return `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@ticker`
+        return `wss://demo-coinbase-${symbol.toLowerCase()}`
     }
   }, [])
 
   const parseMessage = useCallback((symbol: string, data: Record<string, unknown>, exchange: string): AssetPrice | null => {
     try {
+      // Handle mock ticker data
+      if (data.product_id && data.price) {
+        const price = parseFloat((data.price as string) || '0')
+        const open24h = parseFloat((data.open_24h as string) || '0')
+        return {
+          symbol: (data.product_id as string) || symbol,
+          price,
+          change24h: price - open24h,
+          changePercent24h: open24h > 0 ? ((price - open24h) / open24h) * 100 : 0,
+          volume24h: parseFloat((data.volume_24h as string) || '0'),
+          high24h: parseFloat((data.high_24h as string) || '0'),
+          low24h: parseFloat((data.low_24h as string) || '0'),
+          timestamp: new Date((data.time as string) || Date.now()).getTime()
+        }
+      }
+
       switch (exchange) {
-        case 'binance':
-          return {
-            symbol: (data.s as string) || symbol,
-            price: parseFloat((data.c as string) || '0'),
-            change24h: parseFloat((data.P as string) || '0'),
-            changePercent24h: parseFloat((data.P as string) || '0'),
-            volume24h: parseFloat((data.v as string) || '0'),
-            high24h: parseFloat((data.h as string) || '0'),
-            low24h: parseFloat((data.l as string) || '0'),
-            timestamp: parseInt((data.E as string) || Date.now().toString())
-          }
         case 'coinbase':
           if (data.type === 'ticker') {
             const price = parseFloat((data.price as string) || '0')
@@ -75,7 +80,7 @@ export function useMultiAssetStream({
             return {
               symbol: (data.product_id as string) || symbol,
               price,
-              change24h: open24h - price,
+              change24h: price - open24h,
               changePercent24h: open24h > 0 ? ((price - open24h) / open24h) * 100 : 0,
               volume24h: parseFloat((data.volume_24h as string) || '0'),
               high24h: parseFloat((data.high_24h as string) || '0'),
@@ -84,6 +89,36 @@ export function useMultiAssetStream({
             }
           }
           return null
+        case 'kraken':
+          // Kraken WebSocket format
+          if (data.event === 'ticker') {
+            const tickerData = data.data as any
+            const price = parseFloat(tickerData.c?.[0] || '0')
+            const open = parseFloat(tickerData.o?.[0] || '0')
+            return {
+              symbol: symbol,
+              price,
+              change24h: price - open,
+              changePercent24h: open > 0 ? ((price - open) / open) * 100 : 0,
+              volume24h: parseFloat(tickerData.v?.[1] || '0'),
+              high24h: parseFloat(tickerData.h?.[1] || '0'),
+              low24h: parseFloat(tickerData.l?.[1] || '0'),
+              timestamp: Date.now()
+            }
+          }
+          return null
+        case 'coingecko':
+          // Mock CoinGecko format for now
+          return {
+            symbol: symbol,
+            price: parseFloat((data.price as string) || '0'),
+            change24h: parseFloat((data.change_24h as string) || '0'),
+            changePercent24h: parseFloat((data.change_percent_24h as string) || '0'),
+            volume24h: parseFloat((data.volume_24h as string) || '0'),
+            high24h: parseFloat((data.high_24h as string) || '0'),
+            low24h: parseFloat((data.low_24h as string) || '0'),
+            timestamp: Date.now()
+          }
         default:
           return null
       }
@@ -261,7 +296,7 @@ export function useWatchlistStream(watchlist: string[]) {
     unsubscribe
   } = useMultiAssetStream({
     symbols: watchlist,
-    exchange: 'binance'
+    exchange: 'coinbase' // Use Coinbase instead of Binance
   })
 
   const addToWatchlist = useCallback((symbol: string) => {
