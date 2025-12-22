@@ -75,3 +75,36 @@ export function getPnLColor(pnl: number): string {
   if (pnl < 0) return 'text-red-500'
   return 'text-gray-500'
 }
+
+/**
+ * Format relative time (e.g., "2m ago", "1h ago")
+ */
+export function formatRelativeTime(date: Date | string | number): string {
+  const now = new Date()
+  const target = new Date(date)
+  const diffMs = now.getTime() - target.getTime()
+  
+  const diffMinutes = Math.floor(diffMs / (1000 * 60))
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+  
+  if (diffMinutes < 1) return 'Just now'
+  if (diffMinutes < 60) return `${diffMinutes}m ago`
+  if (diffHours < 24) return `${diffHours}h ago`
+  if (diffDays < 7) return `${diffDays}d ago`
+  
+  return target.toLocaleDateString()
+}
+
+/**
+ * Format time for display (HH:MM:SS)
+ */
+export function formatTimeOnly(date: Date | string | number): string {
+  const d = new Date(date)
+  return d.toLocaleTimeString('en-US', {
+    hour12: false,
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  })
+}
