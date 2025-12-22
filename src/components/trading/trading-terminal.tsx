@@ -1,16 +1,24 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { GlassCard } from "@/components/ui/glass-card"
 import { useAgentAlpha, getSignalColor, getSignalBgColor } from "@/hooks/useAgentAlpha"
+import { useFullRealTimeTrading } from "@/hooks/useRealTimeTrading"
+
+interface Analysis {
+  signal: 'BUY_CALL' | 'BUY_PUT' | 'CLOSE_POSITION' | 'HOLD'
+  confidence: number
+  win_rate: number
+  reasoning: string
+  timestamp: number
+}
 import { TradingChart } from "./trading-chart"
 import { WatchlistPanel } from "./watchlist-panel"
-import { AlertPanel } from "./alert-panel"
+import { RealTimeAlerts } from "./real-time-alerts"
 import { OptionsChain } from "./options-chain"
 import { RefreshCw, TrendingUp, TrendingDown, Activity, Wifi, WifiOff, Zap, Target, BarChart3, Bot, LayoutGrid } from "lucide-react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 
 interface LogEntry {
   timestamp: Date;
@@ -43,34 +51,59 @@ export function TradingTerminal() {
     autoRefresh: true,
   });
 
-  const [logs, setLogs] = useState<LogEntry[]>([]);
+  // Real-time trading features
+  const {
+    prices,
+    positions,
+    alerts,
+    notifications,
+    unreadCount,
+    connectionHealth,
+    addPriceAlert,
+    markAlertAsRead
+  } = useFullRealTimeTrading()
+
+  const [logs, setLogs] = useState<LogEntry[]>([{ timestamp: new Date(), agent: 'SYSTEM', message: 'BethNa AI Trader initialized' }]);
   const [isClient, setIsClient] = useState(false);
   const [viewMode, setViewMode] = useState<'chart' | 'options'>('chart');
 
+  // Get real-time price for ETH
+  const ethPrice = prices['ETHUSDT']?.price || indicators?.current_price || 0
+
+  // Set client-side rendering flag
   useEffect(() => {
-    setIsClient(true);
-    setLogs([{ timestamp: new Date(), agent: 'SYSTEM', message: 'BethNa AI Trader initialized' }]);
-  }, []);
+    setIsClient(true)
+  }, [])
+
+  // Add analysis logs
+  const addAnalysisLog = useCallback((analysis: Analysis) => {
+    const newLog: LogEntry = {
+      timestamp: new Date(),
+      agent: 'ALPHA',
+      message: `Signal: ${analysis.signal} | Confidence: ${analysis.confidence}% | ${analysis.reasoning}`,
+    };
+    setLogs(prev => [...prev.slice(-50), newLog]);
+  }, [])
 
   useEffect(() => {
     if (analysis) {
-      const newLog: LogEntry = {
-        timestamp: new Date(),
-        agent: 'ALPHA',
-        message: `Signal: ${analysis.signal} | Confidence: ${analysis.confidence}% | ${analysis.reasoning}`,
-      };
-      setLogs(prev => [...prev.slice(-50), newLog]);
+      addAnalysisLog(analysis)
     }
-  }, [analysis?.timestamp]);
+  }, [analysis?.timestamp, addAnalysisLog])
 
-  useEffect(() => {
+  // Add connection status logs
+  const addConnectionLog = useCallback((connected: boolean) => {
     const statusLog: LogEntry = {
       timestamp: new Date(),
       agent: 'SYSTEM',
-      message: isConnected ? 'Agent Alpha connected' : 'Agent Alpha disconnected',
+      message: connected ? 'Agent Alpha connected' : 'Agent Alpha disconnected',
     };
     setLogs(prev => [...prev.slice(-50), statusLog]);
-  }, [isConnected]);
+  }, [])
+
+  useEffect(() => {
+    addConnectionLog(isConnected)
+  }, [isConnected, addConnectionLog])
 
   const getAgentColor = (agent: string) => {
     switch (agent) {
@@ -92,10 +125,15 @@ export function TradingTerminal() {
           <p className="text-sm text-muted-foreground mt-1">Real-time AI trading system powered by BethNa</p>
         </div>
         <div className="flex items-center gap-3">
-          <Badge variant={isConnected ? "default" : "destructive"} className="gap-1.5 px-3 py-1.5">
-            {isConnected ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
-            {isConnected ? 'Connected' : 'Offline'}
+          <Badge variant={connectionHealth.prices ? "default" : "destructive"} className="gap-1.5 px-3 py-1.5">
+            {connectionHealth.prices ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
+            {connectionHealth.prices ? 'Live Data' : 'Offline'}
           </Badge>
+          {unreadCount > 0 && (
+            <Badge variant="destructive" className="gap-1.5 px-2 py-1">
+              {unreadCount} Alerts
+            </Badge>
+          )}
           <Button
             variant="outline"
             size="sm"
@@ -130,14 +168,14 @@ export function TradingTerminal() {
                   <div>
                     <h2 className="text-lg font-semibold text-foreground">ETH/USDT</h2>
                     <div className="flex items-center gap-2">
-                      {indicators && (
+                      {ethPrice > 0 && (
                         <span className="text-2xl font-bold font-mono text-foreground">
-                          ${indicators.current_price.toLocaleString()}
+                          ${ethPrice.toLocaleString()}
                         </span>
                       )}
-                      {indicators && (
-                        <Badge variant="outline" className="text-success bg-success/10">
-                          +2.34%
+                      {prices['ETHUSDT']?.changePercent24h && (
+                        <Badge variant="outline" className={`${prices['ETHUSDT'].changePercent24h >= 0 ? 'text-success bg-success/10' : 'text-destructive bg-destructive/10'}`}>
+                          {prices['ETHUSDT'].changePercent24h >= 0 ? '+' : ''}{prices['ETHUSDT'].changePercent24h.toFixed(2)}%
                         </Badge>
                       )}
                     </div>
@@ -311,7 +349,7 @@ export function TradingTerminal() {
         {/* Alerts */}
         <div className="lg:col-span-3">
           <GlassCard className="h-[260px]">
-            <AlertPanel className="flex-1 min-h-0" />
+            <RealTimeAlerts className="flex-1 min-h-0" />
           </GlassCard>
         </div>
 
