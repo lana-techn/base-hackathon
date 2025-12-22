@@ -36,13 +36,12 @@ export const TIME_CONSTANTS = {
 // API Endpoints
 export const API_ENDPOINTS = {
   COINGECKO_BASE: 'https://api.coingecko.com/api/v3',
-  THETANUTS_BASE: 'https://api.thetanuts.finance/v1',
+  THETANUTS_BASE: '/api/thetanuts', // Use our proxy
   TWITTER_BASE: 'https://api.twitter.com/2',
   FARCASTER_BASE: 'https://api.farcaster.xyz/v2',
-  BINANCE_WS: 'wss://stream.binance.com:9443/ws',
-  BINANCE_API: 'https://api.binance.com/api/v3',
   COINBASE_WS: 'wss://ws-feed.exchange.coinbase.com',
   KRAKEN_WS: 'wss://ws.kraken.com',
+  // Remove Binance endpoints
 } as const
 
 // Default Agent Configuration
@@ -107,7 +106,7 @@ export const WEBSOCKET_CONFIG = {
   CONNECTION_TIMEOUT: 10000,
   HEARTBEAT_INTERVAL: 30000,
   MAX_BUFFER_SIZE: 1000,
-  PRICE_STREAM_SYMBOLS: ['ETHUSDT', 'BTCUSDT', 'SOLUSDT', 'MATICUSDT'],
+  PRICE_STREAM_SYMBOLS: ['ETH-USD', 'BTC-USD', 'SOL-USD'], // Coinbase format
 } as const
 
 // Alert Configuration
