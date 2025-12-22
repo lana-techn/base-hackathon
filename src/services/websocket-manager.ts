@@ -48,6 +48,18 @@ export class WebSocketConnection {
       this.isManuallyDisconnected = false
       this.notifyStatus('connecting')
 
+      // For demo purposes, simulate connection for certain URLs
+      if (this.config.url.includes('demo') || this.config.url.includes('coingecko')) {
+        setTimeout(() => {
+          console.log(`✅ Mock WebSocket connected: ${this.config.url}`)
+          this.reconnectAttempts = 0
+          this.notifyStatus('connected')
+          this.startMockDataStream()
+          resolve()
+        }, 1000)
+        return
+      }
+
       try {
         this.ws = new WebSocket(this.config.url, this.config.protocols)
 
@@ -108,6 +120,36 @@ export class WebSocketConnection {
         reject(error)
       }
     })
+  }
+
+  private startMockDataStream() {
+    // Simulate real-time price updates for demo
+    const symbols = ['ETH-USD', 'BTC-USD', 'SOL-USD']
+    
+    const interval = setInterval(() => {
+      if (this.isManuallyDisconnected) {
+        clearInterval(interval)
+        return
+      }
+
+      symbols.forEach(symbol => {
+        const basePrice = symbol === 'ETH-USD' ? 3200 : symbol === 'BTC-USD' ? 65000 : 100
+        const mockMessage: WebSocketMessage = {
+          type: 'ticker',
+          data: {
+            product_id: symbol,
+            price: (basePrice + (Math.random() - 0.5) * basePrice * 0.02).toFixed(2),
+            open_24h: (basePrice * 0.98).toFixed(2),
+            volume_24h: (Math.random() * 1000000).toFixed(2),
+            high_24h: (basePrice * 1.05).toFixed(2),
+            low_24h: (basePrice * 0.95).toFixed(2),
+            time: new Date().toISOString()
+          },
+          timestamp: Date.now()
+        }
+        this.handleMessage(mockMessage)
+      })
+    }, 2000) // Update every 2 seconds
   }
 
   private handleMessage(message: WebSocketMessage) {

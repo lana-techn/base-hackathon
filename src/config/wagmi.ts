@@ -8,7 +8,7 @@ const baseTestnetRpcUrl = process.env.NEXT_PUBLIC_BASE_TESTNET_RPC_URL || 'https
 
 export const config = getDefaultConfig({
   appName: 'BethNa AI Trader',
-  projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || 'bethna-ai-trader',
+  projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || 'demo-project-id',
   chains: [base, baseSepolia],
   transports: {
     [base.id]: http(baseRpcUrl),
