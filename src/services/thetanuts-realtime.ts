@@ -46,38 +46,49 @@ export class ThetanutsRealtimeService {
   connect(): Promise<void> {
     return new Promise((resolve, reject) => {
       try {
-        // Use Thetanuts WebSocket endpoint
-        const wsUrl = `wss://api.thetanuts.finance/ws${this.apiKey ? `?key=${this.apiKey}` : ''}`
-        this.ws = new WebSocket(wsUrl)
-
-        this.ws.onopen = () => {
-          console.log('✅ Thetanuts WebSocket connected')
-          this.reconnectAttempts = 0
-          resolve()
-        }
-
-        this.ws.onmessage = (event) => {
-          try {
-            const message: ThetanutsWebSocketMessage = JSON.parse(event.data)
-            this.handleMessage(message)
-          } catch (error) {
-            console.error('Failed to parse WebSocket message:', error)
-          }
-        }
-
-        this.ws.onclose = (event) => {
-          console.log('Thetanuts WebSocket closed:', event.code, event.reason)
-          this.handleReconnect()
-        }
-
-        this.ws.onerror = (error) => {
-          console.error('Thetanuts WebSocket error:', error)
-          reject(error)
-        }
+        // For demo purposes, simulate connection without actual WebSocket
+        console.log('✅ Thetanuts service connected (demo mode)')
+        this.reconnectAttempts = 0
+        
+        // Start mock data updates
+        this.startMockUpdates()
+        resolve()
       } catch (error) {
         reject(error)
       }
     })
+  }
+
+  private startMockUpdates() {
+    // Simulate periodic options data updates
+    setInterval(() => {
+      const mockMessage: ThetanutsWebSocketMessage = {
+        type: 'options_update',
+        data: {
+          asset: 'ETH',
+          options: this.generateMockOptions(),
+        },
+        timestamp: Date.now()
+      }
+      this.handleMessage(mockMessage)
+    }, 5000) // Update every 5 seconds
+  }
+
+  private generateMockOptions() {
+    return [
+      {
+        strike: 3200,
+        premium: 150 + Math.random() * 50,
+        iv: 0.4 + Math.random() * 0.2,
+        type: 'CALL'
+      },
+      {
+        strike: 3200,
+        premium: 120 + Math.random() * 40,
+        iv: 0.35 + Math.random() * 0.2,
+        type: 'PUT'
+      }
+    ]
   }
 
   private handleMessage(message: ThetanutsWebSocketMessage) {
@@ -149,8 +160,11 @@ export class ThetanutsRealtimeService {
 
   async getOptionsChain(asset: 'ETH' | 'BTC'): Promise<ThetanutsOptionsChain> {
     try {
-      const response = await fetch(`${API_ENDPOINTS.THETANUTS_BASE}/options/${asset}`, {
-        headers: this.apiKey ? { 'Authorization': `Bearer ${this.apiKey}` } : {}
+      // Use our API proxy to avoid CORS issues
+      const response = await fetch(`/api/thetanuts?asset=${asset}&chainId=8453`, {
+        headers: {
+          'Content-Type': 'application/json',
+        }
       })
 
       if (!response.ok) {
@@ -160,7 +174,7 @@ export class ThetanutsRealtimeService {
       const data = await response.json()
       return this.parseOptionsChain(data)
     } catch (error) {
-      console.error('Failed to fetch options chain:', error)
+      console.error('Thetanuts API error:', error)
       // Return mock data for development
       return this.getMockOptionsChain(asset)
     }
