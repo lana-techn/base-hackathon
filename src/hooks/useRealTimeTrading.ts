@@ -19,28 +19,28 @@ export interface UseRealTimeTradingReturn {
   // Price data
   prices: Record<string, any>
   priceConnections: Record<string, boolean>
-  
+
   // Position tracking
   positions: any[]
   positionsLoading: boolean
-  
+
   // Alerts
   alerts: any[]
   notifications: any[]
   unreadCount: number
-  
+
   // Options data
   optionsChain: any
-  
+
   // Connection status
   isConnected: boolean
   connectionHealth: Record<string, boolean>
-  
+
   // Controls
   addSymbol: (symbol: string) => void
   removeSymbol: (symbol: string) => void
   reconnectAll: () => void
-  
+
   // Alert controls
   addPriceAlert: (alert: any) => void
   markAlertAsRead: (id: string) => void
@@ -62,7 +62,7 @@ export function useRealTimeTrading(
     reconnect: reconnectPrices
   } = useMultiAssetStream({
     symbols: config.enableMultiAssetStream ? config.symbols : [],
-    exchange: 'binance',
+    exchange: 'coinbase',
     autoReconnect: true
   })
 
@@ -95,7 +95,7 @@ export function useRealTimeTrading(
         // Initialize Thetanuts service if options enabled
         if (config.enableOptionsData) {
           await thetanutsService.connect()
-          
+
           // Subscribe to ETH options chain
           thetanutsService.subscribeToOptionsChain('ETH', (chain) => {
             setOptionsChain(chain)
@@ -126,7 +126,7 @@ export function useRealTimeTrading(
         thetanuts: thetanutsService ? true : false, // Simplified check
         websockets: Object.values(priceConnections).some(Boolean)
       }
-      
+
       setConnectionHealth(health)
     }
 
@@ -201,31 +201,31 @@ export function useRealTimeTrading(
     // Price data
     prices,
     priceConnections,
-    
+
     // Position tracking
     positions: config.enablePositionTracking ? positions : [],
     positionsLoading: config.enablePositionTracking ? positionsLoading : false,
-    
+
     // Alerts
     alerts: config.enableAlerts ? alerts : [],
     notifications: config.enableAlerts ? notifications : [],
     unreadCount: config.enableAlerts ? unreadCount : 0,
-    
+
     // Options data
     optionsChain: config.enableOptionsData ? optionsChain : null,
-    
+
     // Connection status
     isConnected,
     connectionHealth,
-    
+
     // Controls
     addSymbol,
     removeSymbol,
     reconnectAll,
-    
+
     // Alert controls
-    addPriceAlert: config.enableAlerts ? addPriceAlert : () => {},
-    markAlertAsRead: config.enableAlerts ? markAlertAsRead : () => {}
+    addPriceAlert: config.enableAlerts ? addPriceAlert : () => { },
+    markAlertAsRead: config.enableAlerts ? markAlertAsRead : () => { }
   }
 }
 
@@ -238,7 +238,7 @@ export const TRADING_CONFIGS = {
     enableOptionsData: true,
     enableMultiAssetStream: true
   },
-  
+
   PRICE_ONLY: {
     symbols: ['ETHUSDT', 'BTCUSDT'] as string[],
     enablePositionTracking: false,
@@ -246,7 +246,7 @@ export const TRADING_CONFIGS = {
     enableOptionsData: false,
     enableMultiAssetStream: true
   },
-  
+
   ALERTS_FOCUSED: {
     symbols: ['ETHUSDT'] as string[],
     enablePositionTracking: false,
@@ -254,7 +254,7 @@ export const TRADING_CONFIGS = {
     enableOptionsData: false,
     enableMultiAssetStream: true
   },
-  
+
   OPTIONS_TRADER: {
     symbols: ['ETHUSDT', 'BTCUSDT'] as string[],
     enablePositionTracking: true,
