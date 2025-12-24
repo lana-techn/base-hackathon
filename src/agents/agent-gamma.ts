@@ -5,7 +5,7 @@
 
 import { type Hash, type Address, parseAbiItem, type Log } from 'viem'
 import { createBasePublicClient } from '@/lib/blockchain'
-import { NeynarClient, createNeynarClient, type FarcasterCastResponse } from '@/lib/neynar'
+import { postCastToHub, isFarcasterHubConfigured } from '@/lib/farcaster-hub'
 import { OpenRouterClient, createOpenRouterClient } from '@/lib/openrouter'
 import { sentientTraderABI, getContractConfig } from '@/config/contracts'
 import { type AgentMessage, type TradeEvent } from '@/types'
@@ -71,7 +71,7 @@ const CONTENT_TEMPLATES = {
 
 export class AgentGamma {
     private config: AgentGammaConfig
-    private neynarClient: NeynarClient | null = null
+    private farcasterEnabled: boolean = false
     private aiClient: OpenRouterClient | null = null
     private lastPostTime: number = 0
     private messageLog: AgentMessage[] = []
@@ -83,13 +83,13 @@ export class AgentGamma {
     }
 
     private initializeClients(): void {
-        try {
-            if (this.config.enableFarcaster) {
-                this.neynarClient = createNeynarClient()
-                this.log('INFO', 'Farcaster client initialized')
+        if (this.config.enableFarcaster) {
+            this.farcasterEnabled = isFarcasterHubConfigured()
+            if (this.farcasterEnabled) {
+                this.log('INFO', 'Farcaster Hub configured (Direct Hub)')
+            } else {
+                this.log('INFO', 'Farcaster Hub not configured - set FARCASTER_FID and FARCASTER_PRIVATE_KEY')
             }
-        } catch (error) {
-            this.log('ERROR', `Farcaster init failed: ${(error as Error).message}`)
         }
 
         try {
@@ -236,8 +236,8 @@ Just output the rewritten text, nothing else.`
             timestamp: Date.now()
         }
 
-        if (!this.neynarClient) {
-            this.log('ERROR', 'Farcaster client not initialized')
+        if (!this.farcasterEnabled) {
+            this.log('ERROR', 'Farcaster Hub not configured')
             return post
         }
 
@@ -248,14 +248,15 @@ Just output the rewritten text, nothing else.`
         }
 
         try {
-            const embeds = txHash ? [{ url: this.getTxLink(txHash) }] : undefined
-            const response = await this.neynarClient.postCast({ text: content, embeds })
+            // Add tx link to content if available
+            const fullContent = txHash ? `${content}\n\n🔗 ${this.getTxLink(txHash)}` : content
+            const response = await postCastToHub(fullContent)
 
             if (response.success) {
                 post.success = true
                 post.postId = response.hash
                 this.lastPostTime = Date.now()
-                this.log('SOCIAL', `Posted to Farcaster: ${response.hash}`)
+                this.log('SOCIAL', `Posted to Farcaster Hub: ${response.hash}`)
             } else {
                 this.log('ERROR', `Farcaster post failed: ${response.error}`)
             }

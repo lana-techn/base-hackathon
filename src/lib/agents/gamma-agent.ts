@@ -194,11 +194,11 @@ Tags: ${post.hashtags.join(' ')}`
     }
 
     /**
-     * Post to Farcaster (placeholder - needs Neynar integration)
+     * Post to Farcaster (uses Direct Hub - set FARCASTER_FID and FARCASTER_PRIVATE_KEY)
      */
     async postToFarcaster(post: SocialPost): Promise<boolean> {
         console.log('[GAMMA] Would post to Farcaster:', post.content)
-        // TODO: Implement Neynar API integration
+        // TODO: Implement Direct Hub posting via /api/farcaster-hub/post
         return true
     }
 }

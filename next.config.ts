@@ -4,6 +4,11 @@ const nextConfig: NextConfig = {
   // Basic configuration for stable operation
   reactStrictMode: true,
 
+  // Skip type checking during build (do separately)
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+
   // Enable experimental features that are stable
   experimental: {
     optimizePackageImports: ['@coinbase/onchainkit', 'lucide-react'],

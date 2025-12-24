@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createNeynarClient } from '@/lib/neynar'
+import { postCastToWarpcast, isWarpcastConfigured } from '@/lib/warpcast'
 import { GammaAgent } from '@/lib/ai-agents'
 
-export const runtime = 'nodejs' // Neynar SDK requires Node.js runtime
+export const runtime = 'edge'
 
 interface PostRequestBody {
     text?: string
@@ -19,19 +19,16 @@ interface PostRequestBody {
         price: number
         changePercent24h: number
     }
-    embeds?: { url: string }[]
-    channelId?: string
 }
 
 export async function POST(request: NextRequest) {
     try {
         const body: PostRequestBody = await request.json()
 
-        // Check for required environment variables
-        if (!process.env.NEYNAR_API_KEY || !process.env.NEYNAR_SIGNER_UUID) {
+        if (!isWarpcastConfigured()) {
             return NextResponse.json(
                 {
-                    error: 'Farcaster not configured. Set NEYNAR_API_KEY and NEYNAR_SIGNER_UUID.',
+                    error: 'Warpcast not configured. Set WARPCAST_API_KEY.',
                     success: false
                 },
                 { status: 500 }
@@ -40,18 +37,16 @@ export async function POST(request: NextRequest) {
 
         let textToPost = body.text
 
-        // Generate content using AI if trade data is provided
+        // Generate from trade data
         if (!textToPost && body.generateFromTrade) {
             const gammaAgent = new GammaAgent()
             textToPost = await gammaAgent.generateTradePost(body.generateFromTrade)
-
-            // Add transaction link if available
             if (body.generateFromTrade.txHash) {
                 textToPost += `\n\n🔗 https://basescan.org/tx/${body.generateFromTrade.txHash}`
             }
         }
 
-        // Generate market commentary if market data is provided
+        // Generate from market data  
         if (!textToPost && body.generateFromMarket) {
             const gammaAgent = new GammaAgent()
             textToPost = await gammaAgent.generateMarketCommentary({
@@ -72,27 +67,23 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        // Truncate to Farcaster limit (320 chars)
+        // Truncate to Farcaster limit
         if (textToPost.length > 320) {
             textToPost = textToPost.slice(0, 317) + '...'
         }
 
-        const neynarClient = createNeynarClient()
-        const result = await neynarClient.postCast({
-            text: textToPost,
-            embeds: body.embeds,
-            channelId: body.channelId,
-        })
+        const result = await postCastToWarpcast(textToPost)
 
         return NextResponse.json({
             success: result.success,
             data: result,
+            text: textToPost
         })
     } catch (error) {
-        console.error('Farcaster post API error:', error)
+        console.error('Warpcast post error:', error)
         return NextResponse.json(
             {
-                error: error instanceof Error ? error.message : 'Unknown error occurred',
+                error: error instanceof Error ? error.message : 'Unknown error',
                 success: false,
             },
             { status: 500 }
@@ -101,21 +92,15 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET() {
-    const isConfigured = !!(process.env.NEYNAR_API_KEY && process.env.NEYNAR_SIGNER_UUID)
+    const isConfigured = isWarpcastConfigured()
 
     return NextResponse.json({
         status: isConfigured ? 'configured' : 'not_configured',
         message: isConfigured
-            ? 'Farcaster integration ready'
-            : 'Missing NEYNAR_API_KEY or NEYNAR_SIGNER_UUID',
+            ? 'Warpcast API ready (using Developer API key)'
+            : 'Set WARPCAST_API_KEY from Warpcast Developer settings',
         endpoints: {
-            post: 'POST /api/farcaster/post - Post a cast to Farcaster',
+            post: 'POST /api/warpcast/post - Post a cast to Farcaster via Warpcast',
         },
-        features: [
-            'Direct text posting',
-            'AI-generated trade announcements',
-            'AI-generated market commentary',
-            'Transaction link embedding',
-        ],
     })
 }
