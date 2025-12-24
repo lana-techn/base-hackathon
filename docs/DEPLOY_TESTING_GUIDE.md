@@ -151,6 +151,8 @@ bethna-ai-trader/
 
 ## ⚙️ Environment Variables
 
+⚠️ **PENTING**: File `.env.local` sudah ada di `.gitignore` - API keys TIDAK akan terpush ke Git!
+
 Buat file `.env.local` dengan:
 
 ```env
@@ -159,6 +161,75 @@ OPENROUTER_API_KEY=your_openrouter_api_key
 
 # Base Network
 NEXT_PUBLIC_BASE_RPC_URL=https://mainnet.base.org
+
+# Twitter API (untuk posting)
+TWITTER_API_KEY=your_api_key
+TWITTER_API_SECRET=your_api_secret
+TWITTER_ACCESS_TOKEN=your_access_token
+TWITTER_ACCESS_TOKEN_SECRET=your_access_token_secret
+
+# Farcaster (untuk posting via Direct Hub)
+FARCASTER_FID=your_fid_number
+FARCASTER_PRIVATE_KEY=your_ed25519_private_key
+OPTIMISM_PRIVATE_KEY=your_custody_wallet_private_key
+```
+
+---
+
+## 🐦 Twitter Integration
+
+Twitter posting sudah terintegrasi dan LIVE!
+
+### API Endpoint
+
+```bash
+# Test Twitter endpoint
+curl -X POST http://localhost:3000/api/twitter/post \
+  -H "Content-Type: application/json" \
+  -d '{"generateFromMarket":{"symbol":"ETH","price":3500,"changePercent24h":1.5}}'
+```
+
+### Setup Twitter API Keys
+
+1. Buka https://developer.twitter.com
+2. Buat project/app baru
+3. Settings → User authentication → **Read and write** permissions
+4. Generate Access Token dan Secret
+5. Tambahkan ke `.env.local`
+
+---
+
+## 💜 Farcaster Integration (Direct Hub)
+
+Posting langsung ke Farcaster tanpa Neynar (gratis!).
+
+### Langkah 1: Generate Signer Key
+
+```bash
+npx tsx scripts/generate-farcaster-key.ts
+```
+
+### Langkah 2: Dapatkan Private Key Custody Address
+
+1. Buka Warpcast → Settings → Advanced → Recovery Phrase
+2. Buka https://iancoleman.io/bip39/
+3. Masukkan recovery phrase, set ke ETH
+4. Copy private key dari address pertama
+
+### Langkah 3: Register Key On-Chain
+
+Butuh sedikit ETH di Optimism (~$0.50) untuk gas.
+
+```bash
+npx tsx scripts/register-farcaster-key.ts
+```
+
+### Langkah 4: Test Posting
+
+```bash
+curl -X POST http://localhost:3000/api/farcaster-hub/post \
+  -H "Content-Type: application/json" \
+  -d '{"generateFromMarket":{"symbol":"ETH","price":3500,"changePercent24h":1.5}}'
 ```
 
 ---
@@ -192,6 +263,15 @@ forge script contracts/script/Deploy.s.sol:DeploySentientTrader \
 
 ---
 
+## 🔒 Keamanan
+
+- ✅ `.env.local` di-exclude dari Git via `.gitignore`
+- ⚠️ JANGAN commit file yang berisi API keys
+- ⚠️ JANGAN share private keys
+- ✅ Gunakan environment variables di Vercel untuk production
+
+---
+
 ## ❓ Troubleshooting
 
 | Masalah | Solusi |
@@ -199,3 +279,6 @@ forge script contracts/script/Deploy.s.sol:DeploySentientTrader \
 | `OpenRouter API key not configured` | Set `OPENROUTER_API_KEY` di `.env.local` |
 | `Thetanuts Router address not set` | Dapatkan address dari Thetanuts docs |
 | `anvil: command not found` | Install Foundry: `curl -L https://foundry.paradigm.xyz \| bash` |
+| Twitter 403 error | Cek app permissions → harus "Read and write" |
+| Farcaster insufficient balance | Kirim ETH ke custody address di Optimism |
+
