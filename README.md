@@ -2,6 +2,18 @@
 
 **Autonomous Swarm Agent System** for AI-powered cryptocurrency options trading on Base L2 network with Thetanuts integration.
 
+## 📚 Documentation
+
+For comprehensive project documentation, see:
+
+| Document | Description |
+|----------|-------------|
+| **[Overview](./docs/Overview.md)** | Complete project documentation (tech stack, architecture, flow, features) |
+| [Deployment Guide](./docs/DEPLOYMENT.md) | Production deployment instructions |
+| [Git Workflow](./docs/GIT_WORKFLOW.md) | Branching strategy and contribution guide |
+| [Real-time Features](./docs/REAL_TIME_FEATURES.md) | WebSocket implementation details |
+| [Agent Details](./docs/Agent.md) | Detailed agent documentation |
+
 ## 🤖 Swarm Agent Architecture
 
 BethNa AI Trader operates as a **Swarm Agent System** with specialized agents:
