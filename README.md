@@ -133,32 +133,6 @@ pnpm dev:fast
 
 The application will automatically fallback to mock data when Agent Alpha backend is unavailable.
 
-## 📊 Application Features
-
-### Current Features (Completed Tasks 1-2, 8.1-8.7)
-
-- ✅ **Modern Web3 UI** - Next.js 14 with TypeScript and Tailwind CSS
-- ✅ **Real-time Trading Terminal** - Live market data and AI signals
-- ✅ **Agent Alpha Integration** - Market analysis with technical indicators
-- ✅ **Wallet Connection** - OnchainKit integration for Base network
-- ✅ **Data Models & Validation** - TypeScript interfaces with property-based testing
-- ✅ **War Room Log** - Real-time agent communication display
-- ✅ **Modern Web3 Design System** - Glassmorphism, GSAP animations, Framer Motion
-- ✅ **Landing Page** - Hero section with parallax scroll and Bento Grid layouts
-- ✅ **AI Agents Showcase** - Interactive agent cards with live stats
-- ✅ **Floating Navigation** - Modern Web3 navigation with wallet integration
-- ✅ **Micro-interactions** - Smooth animations and hover effects
-
-### Upcoming Features (Tasks 3-13)
-
-- 🔄 **Agent Alpha Enhancement** - Full Python FastAPI service with Binance integration
-- 🔄 **Smart Contracts** - SentientTrader contract for Thetanuts V4 integration
-- 🔄 **Agent Beta** - Options trading engine with Thetanuts network
-- 🔄 **Agent Gamma** - Base L2 blockchain operations and position tracking
-- 🔄 **Agent Delta** - Social media automation (Twitter/X, Farcaster)
-- 🔄 **Modern Web3 Design** - Aceternity UI, GSAP animations, glassmorphism
-- 🔄 **Landing Page** - Hero section with parallax scroll and Bento Grid
-- 🔄 **Trading Dashboard** - Advanced charts and position management
 
 ## 🛠️ Development
 
@@ -238,34 +212,6 @@ uv sync
 pip install -r requirements.txt
 ```
 
-**4. Wallet Connection Issues**
-- Ensure you have a Web3 wallet installed (MetaMask, Coinbase Wallet)
-- Switch to Base network (Chain ID: 8453)
-- Check NEXT_PUBLIC_ONCHAINKIT_API_KEY in .env.local
-
-### Environment Variables Status
-
-**✅ Already Configured:**
-- OpenRouter AI API (free model)
-- Twitter API credentials
-- Farcaster/Neynar API credentials
-
-**⚠️ Need Configuration:**
-- `BINANCE_API_KEY` & `BINANCE_SECRET_KEY` - For real market data
-- `THETANUTS_API_KEY` - For options trading
-- `NEXT_PUBLIC_ONCHAINKIT_API_KEY` - For enhanced wallet features
-- Contract addresses (will be added after deployment)
-
-## 🚨 Disclaimer
-
-This is an autonomous swarm agent system that operates across multiple blockchain networks and external services. Users should understand the risks involved in automated trading:
-
-- **Financial Risk**: Automated trading can result in significant losses
-- **Smart Contract Risk**: Unaudited contracts may contain vulnerabilities  
-- **Network Risk**: Blockchain networks may experience downtime or congestion
-- **API Risk**: External services may become unavailable
-
-**Use at your own risk. This is experimental software.**
 
 ## 📝 License
 
@@ -276,62 +222,3 @@ Private repository - All rights reserved.
 This is a private development project. For questions or issues, contact the development team.
 
 ---
-
-**Next Steps:**
-1. Configure required API keys in `.env.local`
-2. Run both frontend and backend servers
-3. Test wallet connection on Base network
-4. Monitor War Room Log for agent communications
-
-**Current Status:** Tasks 1-2, 8.1-8.7 completed ✅ | Task 3+ in development 🔄
-
-## 🎨 Modern Web3 Design Features
-
-### Glassmorphism Design System
-- **Glass Cards** - Backdrop blur effects with subtle transparency
-- **Floating Navigation** - Auto-hiding navigation with smooth animations
-- **Theme System** - Consistent color palette and design tokens
-- **Micro-interactions** - Hover effects, scale animations, and smooth transitions
-
-### GSAP & Framer Motion Animations
-- **Parallax Scrolling** - Multi-layer scrolling effects on landing page
-- **Typewriter Effect** - Animated text for hero section
-- **Stagger Animations** - Sequential element animations
-- **Smooth Scroll** - Lenis integration for buttery smooth scrolling
-
-### Bento Grid Layouts
-- **Responsive Grid System** - Adaptive layouts for different screen sizes
-- **Dynamic Sizing** - Components with flexible column/row spans
-- **Interactive Cards** - Hover effects and animated counters
-- **Modern Spacing** - Consistent gaps and padding throughout
-
-### Component Library
-- **Reusable Components** - Modular design system components
-- **TypeScript Support** - Full type safety across all components
-- **Accessibility** - ARIA labels and keyboard navigation support
-- **Performance Optimized** - Lazy loading and efficient animations
-
-### Shadcn/UI Components (Enhanced with Glassmorphism)
-- **Button** - Multiple variants (default, glass, outline, glow) with animations
-- **Input** - Glass and default variants with focus states
-- **Select** - Dropdown with glassmorphism styling
-- **Switch** - Toggle component with smooth transitions
-- **Progress** - Animated progress bars with gradient fills
-- **Toast** - Notification system with multiple variants
-- **Alert Dialog** - Modal dialogs with backdrop blur
-- **Popover** - Floating content with glassmorphism
-- **Label** - Form labels with consistent styling
-- **Separator** - Divider lines with transparency
-- **Card** - Enhanced with glass variants and animations
-
-### Shadcn/UI Components (Enhanced with Glassmorphism)
-- **Button** - Multiple variants (default, glass, outline, glow, etc.)
-- **Input & Label** - Form components with glass styling
-- **Select** - Dropdown with backdrop blur effects
-- **Switch** - Toggle component with smooth animations
-- **Progress** - Gradient progress bars
-- **Toast** - Notification system with multiple variants
-- **Alert Dialog** - Modal dialogs with glassmorphism
-- **Popover** - Floating content with backdrop blur
-- **Separator** - Divider components
-- **Card** - Enhanced with glass variants and animations
