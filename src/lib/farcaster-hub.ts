@@ -41,7 +41,7 @@ export async function postCastToHub(text: string): Promise<CastResult> {
         // Get configuration from environment
         const fid = parseInt(process.env.FARCASTER_FID || '0')
         const privateKey = process.env.FARCASTER_PRIVATE_KEY || ''
-        const hubUrl = process.env.FARCASTER_HUB_URL || 'hub.farcaster.standardcrypto.vc:2283'
+        const hubUrl = process.env.FARCASTER_HUB_URL || 'nemes.farcaster.xyz:2283'
 
         if (!fid || !privateKey) {
             return {
