@@ -9,6 +9,7 @@ For comprehensive project documentation, see:
 | Document | Description |
 |----------|-------------|
 | **[Overview](./docs/Overview.md)** | Complete project documentation (tech stack, architecture, flow, features) |
+| **[Financial Advisor Feature](./docs/FINANCIAL_ADVISOR_FEATURE.md)** | Agent Delta docs - AI-powered financial management for beginners |
 | [Deployment Guide](./docs/DEPLOYMENT.md) | Production deployment instructions |
 | [Git Workflow](./docs/GIT_WORKFLOW.md) | Branching strategy and contribution guide |
 | [Real-time Features](./docs/REAL_TIME_FEATURES.md) | WebSocket implementation details |
