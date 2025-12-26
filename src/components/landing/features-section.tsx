@@ -2,6 +2,13 @@
 
 import { GlassCard } from "@/components/ui/glass-card"
 import { useEffect, useRef, useState } from "react"
+import { 
+  FadeInUp, 
+  StaggerContainer, 
+  StaggerItem, 
+  HoverScale,
+  HoverGlow 
+} from "@/components/ui/smooth-animations"
 
 const agents = [
   {

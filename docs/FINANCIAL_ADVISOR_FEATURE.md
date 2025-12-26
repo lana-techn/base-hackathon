@@ -10,6 +10,88 @@ BethNa AI bukan hanya untuk trader profesional. Platform ini dirancang agar **or
 
 ---
 
+## 🎨 UI Design Reference
+
+### Design Sources
+
+| Page | Reference Style | Key Elements |
+|------|-----------------|--------------|
+| `/onboarding` | Careora (Health Onboarding) | Welcome screen, step cards, progress sidebar |
+| `/dashboard/chat` | Orbita GPT (AI Chat) | Chat bubbles, history sidebar, quick actions |
+
+### Page Structure
+
+```
+FIRST VISIT: /onboarding
+┌──────────────────┬─────────────────────────────────────────────────────┐
+│  Progress        │              Welcome Screen                        │
+│  Sidebar         │                                                     │
+│                  │  "Welcome to BethNa AI, [Name]! 👋"                │
+│  ● Income        │                                                     │
+│  ○ Expenses      │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐  │
+│  ○ Savings       │  │ #1      │ │ #2      │ │ #3      │ │ #4      │  │
+│  ○ Risk          │  │ Income  │ │ Expense │ │ Risk    │ │ Goal    │  │
+│  ○ Goal          │  └─────────┘ └─────────┘ └─────────┘ └─────────┘  │
+│                  │                                                     │
+│                  │            [Get Started Button]                     │
+└──────────────────┴─────────────────────────────────────────────────────┘
+
+AFTER ONBOARDING: /dashboard/chat
+┌──────────┬──────────────┬──────────────────────────────────────────────┐
+│  Main    │  Chat        │              AI Chat Interface               │
+│  Sidebar │  History     │                                              │
+│ (exist)  │  Sidebar     │          "Hi, there 👋"                      │
+│          │              │          Tell us what you need               │
+│  🏠 Home │  Today       │                                              │
+│  📊 Port │  ├─ Chat 1   │  ┌──────────────────────────────────────┐   │
+│  💬 Chat │  └─ Chat 2   │  │ 🤖 BethNa   Financial Advisor       │   │
+│  ⚙️ Set  │              │  │ Your personal AI for DeFi investing │   │
+│          │  Yesterday   │  └──────────────────────────────────────┘   │
+│          │  └─ Chat 3   │                                              │
+│          │              │  [Quick Actions: Deposit, Check, Ask]       │
+│          │              │                                              │
+│          │              │  ┌──────────────────────────────────────┐   │
+│          │              │  │ Ask me anything...            [Send] │   │
+│          │              │  └──────────────────────────────────────┘   │
+└──────────┴──────────────┴──────────────────────────────────────────────┘
+```
+
+### Color Scheme
+
+Tetap menggunakan BethNa existing theme:
+
+| Element | Color | Usage |
+|---------|-------|-------|
+| **Primary** | Lime Green (#C1FF72) | Buttons, accents, highlights |
+| **Background** | Dark (#0A0A0B) | Main background |
+| **Card** | Glass effect | Cards, sidebars |
+| **Text** | White/Gray | Primary/secondary text |
+
+### Component Specifications
+
+#### Onboarding Progress Sidebar
+```
+Width: 280px (fixed)
+Style: Glass effect with blur
+Progress indicators: ● (completed), ◐ (current), ○ (upcoming)
+```
+
+#### Chat History Sidebar
+```
+Width: 260px (collapsible)
+Sections: Today, Yesterday, Last 7 Days, Older
+Chat items: Title + preview text + timestamp
+```
+
+#### Chat Input Area
+```
+Style: Glass card with border
+Placeholder: "Ask me anything..."
+Actions: Attach, Voice, Send button
+```
+
+---
+
 ## 🤖 Agent Architecture (Updated)
 
 ```mermaid
@@ -506,9 +588,325 @@ sequenceDiagram
 │                                                 │
 └─────────────────────────────────────────────────┘
                         ↓
-              [Onboarding starts]
+              [User clicks Mulai Setup]
                         ↓
-              Agent Delta takes over
+         🆕 REDIRECT KE AI CHAT PAGE 🆕
+```
+
+---
+
+## 💬 AI Onboarding Chat Page
+
+### Konsep
+
+Sebelum user masuk ke Dashboard, mereka **HARUS** melewati halaman **AI Chat** untuk breakdown keuangan mereka. Ini adalah halaman khusus (`/onboarding`) yang berbeda dari Dashboard.
+
+### Page Flow
+
+```
+/                    → Landing Page
+/onboarding          → AI Chat Page (WAJIB untuk new user)
+/dashboard           → Main Dashboard (setelah onboarding selesai)
+```
+
+### Route Protection Logic
+
+```typescript
+// middleware.ts atau page component
+async function checkUserAccess(walletAddress: string) {
+  const user = await getUserProfile(walletAddress);
+  
+  if (!user) {
+    // New user - redirect ke onboarding
+    return redirect('/onboarding');
+  }
+  
+  if (!user.onboardingCompleted) {
+    // Onboarding belum selesai - redirect ke onboarding
+    return redirect('/onboarding');
+  }
+  
+  // User sudah complete - allow access ke dashboard
+  return true;
+}
+```
+
+### AI Chat Page UI (`/onboarding`)
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  BethNa AI                                    0x1234...abcd  [⚙️]  │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │                                                             │   │
+│  │                      🤖 BethNa AI                          │   │
+│  │              Your Personal Financial Advisor                │   │
+│  │                                                             │   │
+│  │  ┌─────────────────────────────────────────────────────┐   │   │
+│  │  │  🤖 Hai! Saya BethNa, asisten keuangan AI kamu.    │   │   │
+│  │  │                                                     │   │   │
+│  │  │  Sebelum kita mulai, saya ingin mengenal situasi   │   │   │
+│  │  │  keuangan kamu agar bisa memberikan saran yang     │   │   │
+│  │  │  tepat.                                            │   │   │
+│  │  │                                                     │   │   │
+│  │  │  Boleh saya tanya beberapa hal?                    │   │   │
+│  │  └─────────────────────────────────────────────────────┘   │   │
+│  │                                                             │   │
+│  │  ┌─────────────────────────────────────────────────────┐   │   │
+│  │  │  👤 Ya, boleh!                                      │   │   │
+│  │  └─────────────────────────────────────────────────────┘   │   │
+│  │                                                             │   │
+│  │  ┌─────────────────────────────────────────────────────┐   │   │
+│  │  │  🤖 Bagus! Pertama, berapa penghasilan bulanan     │   │   │
+│  │  │  kamu saat ini?                                    │   │   │
+│  │  │                                                     │   │   │
+│  │  │  [< 5 juta] [5-10 juta] [10-20 juta] [> 20 juta]   │   │   │
+│  │  └─────────────────────────────────────────────────────┘   │   │
+│  │                                                             │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                                                     │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │  Ketik pesan...                                    [Send]  │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                                                     │
+│  Progress: ████████░░░░░░░░░░░░ 40% (3/7 questions)               │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Onboarding Chat Flow (Complete)
+
+```
+🤖 BethNa: "Hai! Saya BethNa, asisten keuangan AI kamu.
+           Sebelum kita mulai, saya ingin mengenal situasi keuangan 
+           kamu agar bisa memberikan saran yang tepat.
+           
+           Boleh saya tanya beberapa hal?"
+
+👤 User: "Ya, boleh!"
+
+───────────────────────────────────────────────────────
+STEP 1: INCOME (Penghasilan)
+───────────────────────────────────────────────────────
+
+🤖 BethNa: "Bagus! Pertama, berapa penghasilan bulanan kamu saat ini?"
+
+   [< 5 juta] [5-10 juta] [10-20 juta] [> 20 juta]
+
+👤 User: [5-10 juta]
+
+🤖 BethNa: "Oke, penghasilan Rp 5-10 juta per bulan. 
+           Ini sudah cukup bagus untuk mulai berinvestasi! 💪"
+
+───────────────────────────────────────────────────────
+STEP 2: EXPENSES (Pengeluaran)
+───────────────────────────────────────────────────────
+
+🤖 BethNa: "Sekarang tentang pengeluaran bulanan kamu.
+           Kira-kira berapa persen dari gaji yang biasa kamu habiskan?"
+
+   [< 50%] [50-70%] [70-90%] [> 90%]
+
+👤 User: [50-70%]
+
+🤖 BethNa: "Jadi kamu punya sekitar 30-50% sisa setiap bulan. 
+           Itu bagus! Berarti ada ruang untuk menabung dan invest."
+
+───────────────────────────────────────────────────────
+STEP 3: SAVINGS (Tabungan)
+───────────────────────────────────────────────────────
+
+🤖 BethNa: "Apakah kamu sudah punya dana darurat? 
+           (Idealnya 3-6x pengeluaran bulanan)"
+
+   [Belum ada] [< 3 bulan] [3-6 bulan] [> 6 bulan]
+
+👤 User: [< 3 bulan]
+
+🤖 BethNa: "Oke, dana darurat kamu masih kurang dari 3 bulan.
+           
+           💡 Tips: Idealnya, bangun dulu dana darurat sebelum invest 
+           agresif. Tapi kita masih bisa mulai dengan jumlah kecil!"
+
+───────────────────────────────────────────────────────
+STEP 4: INVESTMENT EXPERIENCE (Pengalaman Investasi)
+───────────────────────────────────────────────────────
+
+🤖 BethNa: "Seberapa familiar kamu dengan investasi dan crypto?"
+
+   [🌱 Pemula - baru mulai]
+   [📈 Menengah - pernah invest saham/reksadana]
+   [🚀 Mahir - sudah trading crypto]
+
+👤 User: [🌱 Pemula]
+
+🤖 BethNa: "Tidak masalah! Semua orang mulai dari nol.
+           Saya akan bantu jelaskan semuanya dengan bahasa sederhana. 😊"
+
+───────────────────────────────────────────────────────
+STEP 5: RISK TOLERANCE (Toleransi Risiko)
+───────────────────────────────────────────────────────
+
+🤖 BethNa: "Pertanyaan penting: Bagaimana perasaan kamu kalau nilai 
+           investasi turun 20% dalam sebulan?"
+
+   [😰 Panik, mau jual semua]
+   [😐 Khawatir tapi bisa tahan]
+   [😎 Santai, ini kesempatan beli lagi]
+
+👤 User: [😐 Khawatir tapi bisa tahan]
+
+🤖 BethNa: "Good! Kamu punya mentalitas yang cukup stabil.
+           Ini penting untuk investasi jangka panjang."
+
+───────────────────────────────────────────────────────
+STEP 6: INVESTMENT AMOUNT (Jumlah Investasi)
+───────────────────────────────────────────────────────
+
+🤖 BethNa: "Based on semua yang kamu ceritakan, saya sarankan untuk 
+           invest 10-20% dari gaji kamu.
+           
+           Dengan gaji Rp 5-10 juta, berarti sekitar:
+           💰 Rp 500.000 - Rp 2.000.000/bulan
+           
+           Berapa yang nyaman untuk kamu?"
+
+   [Rp 500rb] [Rp 1 juta] [Rp 1.5 juta] [Custom]
+
+👤 User: [Rp 500rb]
+
+🤖 BethNa: "Perfect! Rp 500.000/bulan adalah awal yang bagus.
+           Ingat: Konsistensi lebih penting dari jumlah besar!"
+
+───────────────────────────────────────────────────────
+STEP 7: FINANCIAL GOAL (Tujuan Keuangan)
+───────────────────────────────────────────────────────
+
+🤖 BethNa: "Terakhir, apa tujuan keuangan utama kamu?"
+
+   [🏠 Beli rumah/properti]
+   [🎓 Dana pendidikan]
+   [🏖️ Dana pensiun]
+   [💰 Passive income]
+   [📈 Grow wealth]
+
+👤 User: [💰 Passive income]
+
+───────────────────────────────────────────────────────
+SUMMARY & PROFILE CREATION
+───────────────────────────────────────────────────────
+
+🤖 BethNa: "Terima kasih sudah menjawab! 🎉
+
+           Berdasarkan semua jawaban kamu, ini profil keuangan kamu:
+           
+           ┌─────────────────────────────────────────┐
+           │  📊 PROFIL KEUANGAN KAMU                │
+           ├─────────────────────────────────────────┤
+           │  💵 Penghasilan: Rp 5-10 juta/bulan    │
+           │  💰 Sisa bulanan: ~30-50%              │
+           │  🛡️ Dana darurat: < 3 bulan            │
+           │  📈 Experience: Pemula                  │
+           │  🎯 Risk Profile: BALANCED             │
+           │  💸 Investment: Rp 500.000/bulan       │
+           │  🏆 Goal: Passive Income               │
+           └─────────────────────────────────────────┘
+           
+           Dengan profil ini, saya rekomendasikan:
+           
+           ✅ Strategy: BALANCED (mix conservative + growth)
+           ✅ Vault: Thetanuts Mixed Vault
+           ✅ Expected Yield: 10-15%/tahun
+           
+           Siap untuk mulai? 🚀"
+
+   [✅ Ya, mulai sekarang!] [🔄 Ubah jawaban]
+
+👤 User: [✅ Ya, mulai sekarang!]
+
+🤖 BethNa: "Selamat! Profil kamu sudah tersimpan.
+           
+           Kamu akan diarahkan ke Dashboard dalam 3 detik...
+           
+           Di Dashboard, kamu bisa:
+           • Lihat portfolio kamu
+           • Tambah dana investasi
+           • Chat dengan saya kapan saja
+           
+           Let's grow your wealth together! 💪"
+
+           [Redirecting to Dashboard... 3... 2... 1...]
+```
+
+### Page Component Structure
+
+```typescript
+// src/app/onboarding/page.tsx
+
+interface OnboardingState {
+  step: number;
+  totalSteps: number;
+  answers: {
+    income?: string;
+    expenses?: string;
+    savings?: string;
+    experience?: string;
+    riskTolerance?: string;
+    investmentAmount?: number;
+    financialGoal?: string;
+  };
+  chatHistory: ChatMessage[];
+  isComplete: boolean;
+}
+
+export default function OnboardingPage() {
+  const { address } = useAccount();
+  const [state, setState] = useState<OnboardingState>(initialState);
+  
+  // Redirect if already onboarded
+  useEffect(() => {
+    if (user?.onboardingCompleted) {
+      router.push('/dashboard');
+    }
+  }, [user]);
+  
+  // Handle AI responses and progression
+  async function handleUserResponse(response: string) {
+    // Add user message to chat
+    // Get AI response
+    // Update step
+    // If complete, save profile and redirect
+  }
+  
+  return (
+    <div className="onboarding-container">
+      <Header walletAddress={address} />
+      <ChatInterface 
+        messages={state.chatHistory}
+        onSendMessage={handleUserResponse}
+        quickReplies={getQuickRepliesForStep(state.step)}
+      />
+      <ProgressBar current={state.step} total={state.totalSteps} />
+    </div>
+  );
+}
+```
+
+### API untuk Onboarding
+
+```
+POST /api/onboarding/start
+- Input: { walletAddress: string }
+- Output: { sessionId: string, firstMessage: string }
+
+POST /api/onboarding/respond
+- Input: { sessionId: string, response: string }
+- Output: { aiMessage: string, step: number, quickReplies?: string[] }
+
+POST /api/onboarding/complete
+- Input: { sessionId: string, walletAddress: string }
+- Output: { profile: UserProfile, redirectUrl: string }
 ```
 
 ### User Profile Schema

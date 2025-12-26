@@ -3,11 +3,21 @@
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState, useRef } from 'react'
+import { 
+  FadeInUp, 
+  FadeIn, 
+  ScaleIn, 
+  StaggerContainer, 
+  StaggerItem, 
+  HoverScale, 
+  HoverGlow,
+  AnimatedCounter 
+} from '@/components/ui/smooth-animations'
 
 // Animated orb/globe component for Orbit style
 function OrbitGlobe({ className }: { className?: string }) {
   return (
-    <div className={`relative ${className}`}>
+    <ScaleIn delay={0.8} className={`relative ${className}`}>
       {/* Main glowing orb */}
       <div className="absolute inset-0 rounded-full bg-gradient-to-br from-orbit-500/40 via-orbit-600/30 to-transparent blur-2xl animate-orbit-pulse" />
       <div className="absolute inset-4 rounded-full bg-gradient-to-br from-orbit-400/30 via-primary/20 to-transparent blur-xl" />
@@ -28,7 +38,7 @@ function OrbitGlobe({ className }: { className?: string }) {
       <div className="absolute top-[10%] right-[15%] w-2 h-2 rounded-full bg-orbit-400 animate-float" />
       <div className="absolute bottom-[20%] left-[10%] w-1.5 h-1.5 rounded-full bg-orbit-500 animate-float-slow" />
       <div className="absolute top-[40%] right-[5%] w-1 h-1 rounded-full bg-white/60 animate-pulse" />
-    </div>
+    </ScaleIn>
   )
 }
 
@@ -53,59 +63,49 @@ function SpaceBackground() {
       />
 
       {/* Radial glow */}
-      <div className="parallax-slow absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-orbit-500/5 dark:bg-orbit-500/10 rounded-full blur-3xl" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-orbit-500/5 dark:bg-orbit-500/10 rounded-full blur-3xl" />
 
       {/* Top decorative blur */}
-      <div className="parallax-fast absolute -top-40 -right-40 w-80 h-80 bg-orbit-500/20 dark:bg-orbit-500/30 rounded-full blur-3xl" />
-      <div className="parallax-slow absolute -bottom-40 -left-40 w-80 h-80 bg-primary/10 dark:bg-primary/20 rounded-full blur-3xl" />
+      <div className="absolute -top-40 -right-40 w-80 h-80 bg-orbit-500/20 dark:bg-orbit-500/30 rounded-full blur-3xl" />
+      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-primary/10 dark:bg-primary/20 rounded-full blur-3xl" />
     </div>
   )
 }
 
 // Animated stats counter
 function AnimatedNumber({ value, suffix = '' }: { value: number, suffix?: string }) {
-  const [count, setCount] = useState(0)
-
-  useEffect(() => {
-    const duration = 2000
-    const steps = 60
-    const increment = value / steps
-    let current = 0
-
-    const timer = setInterval(() => {
-      current += increment
-      if (current >= value) {
-        setCount(value)
-        clearInterval(timer)
-      } else {
-        setCount(Math.floor(current))
-      }
-    }, duration / steps)
-
-    return () => clearInterval(timer)
-  }, [value])
-
-  return <span>{count.toLocaleString()}{suffix}</span>
+  return (
+    <AnimatedCounter 
+      value={value} 
+      suffix={suffix}
+      duration={2}
+    />
+  )
 }
 
 // Stats separator dot
 function StatSeparator() {
   return (
-    <div className="hidden md:flex items-center justify-center">
+    <FadeIn delay={1.2} className="hidden md:flex items-center justify-center">
       <div className="w-1.5 h-1.5 rounded-full bg-orbit-500/50" />
-    </div>
+    </FadeIn>
   )
 }
 
 // Individual stat item
-function StatItem({ value, label, prefix = '' }: { value: string | number, label: string, prefix?: string }) {
+function StatItem({ value, label, prefix = '', delay = 0 }: { 
+  value: string | number, 
+  label: string, 
+  prefix?: string,
+  delay?: number 
+}) {
   return (
-    <div className="text-center">
+    <FadeInUp delay={delay} className="text-center">
       <div className="text-2xl md:text-3xl font-bold text-foreground">
         {prefix}{typeof value === 'number' ? <AnimatedNumber value={value} /> : value}
       </div>
       <div className="text-xs md:text-sm text-muted-foreground mt-1">{label}</div>
-    </div>
+    </FadeInUp>
   )
 }
 
@@ -195,7 +195,7 @@ export function HeroSection() {
   }, [])
 
   return (
-    <section className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background pt-20">
+    <div className="hero-section min-h-screen flex items-center justify-center relative overflow-hidden bg-background pt-20">
       {/* Background effects */}
       <SpaceBackground />
       <Particles />
@@ -212,57 +212,75 @@ export function HeroSection() {
             }}
           >
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orbit-500/10 dark:bg-orbit-500/20 border border-orbit-500/20 dark:border-orbit-500/30 mb-8 backdrop-blur-sm">
+            <FadeIn delay={0.2} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orbit-500/10 dark:bg-orbit-500/20 border border-orbit-500/20 dark:border-orbit-500/30 mb-8 backdrop-blur-sm">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orbit-500 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-orbit-500"></span>
               </span>
               <span className="text-sm font-medium text-orbit-500">Live on Base L2</span>
-            </div>
+            </FadeIn>
 
             {/* Title */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 tracking-tight">
-              <span className="text-foreground">The world's most</span>
-              <span className="block mt-2 bg-gradient-to-r from-orbit-500 via-primary to-orbit-400 bg-clip-text text-transparent">
-                trusted AI trader
-              </span>
-            </h1>
+            <div className="hero-title">
+              <FadeInUp delay={0.4}>
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 tracking-tight">
+                  <span className="text-foreground">The world's most</span>
+                  <span className="block mt-2 bg-gradient-to-r from-orbit-500 via-primary to-orbit-400 bg-clip-text text-transparent">
+                    trusted AI trader
+                  </span>
+                </h1>
+              </FadeInUp>
+            </div>
 
             {/* Subtitle */}
-            <p className="text-base md:text-lg text-muted-foreground mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-              Autonomous AI options trading system built on{' '}
-              <span className="text-foreground font-medium">Base L2</span>.
-              Three specialized AI agents working in{' '}
-              <span className="text-orbit-500 font-medium">perfect coordination</span>.
-            </p>
+            <div className="hero-subtitle">
+              <FadeInUp delay={0.6}>
+                <p className="text-base md:text-lg text-muted-foreground mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+                  Autonomous AI options trading system built on{' '}
+                  <span className="text-foreground font-medium">Base L2</span>.
+                  Three specialized AI agents working in{' '}
+                  <span className="text-orbit-500 font-medium">perfect coordination</span>.
+                </p>
+              </FadeInUp>
+            </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12">
-              <Button
-                size="lg"
-                onClick={() => router.push('/dashboard')}
-                className="group relative overflow-hidden bg-primary hover:bg-[#C1FF72] text-primary-foreground hover:text-black px-8 py-6 text-lg rounded-xl shadow-lg shadow-primary/25 hover:shadow-[0_0_20px_rgba(193,255,114,0.6)] transition-all duration-300"
-              >
-                <span className="relative z-10 flex items-center gap-2">
-                  Get started
-                  <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                  </svg>
-                </span>
-              </Button>
+            <div className="hero-cta">
+              <ScaleIn delay={0.8}>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12">
+                  <HoverScale scale={1.05}>
+                    <HoverGlow>
+                      <Button
+                        size="lg"
+                        onClick={() => router.push('/dashboard')}
+                        className="group relative overflow-hidden bg-primary hover:bg-[#C1FF72] text-primary-foreground hover:text-black px-8 py-6 text-lg rounded-xl shadow-lg shadow-primary/25 transition-all duration-300"
+                      >
+                        <span className="relative z-10 flex items-center gap-2">
+                          Get started
+                          <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                          </svg>
+                        </span>
+                      </Button>
+                    </HoverGlow>
+                  </HoverScale>
 
-              <Button
-                size="lg"
-                variant="outline"
-                className="px-8 py-6 text-lg rounded-xl border-border/50 dark:border-white/10 bg-card/50 dark:bg-card/30 backdrop-blur-sm hover:border-[#C1FF72] hover:shadow-[0_0_15px_rgba(193,255,114,0.4)] transition-all duration-300"
-              >
-                <span className="flex items-center gap-2">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  Whitepaper
-                </span>
-              </Button>
+                  <HoverScale scale={1.02}>
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="px-8 py-6 text-lg rounded-xl border-border/50 dark:border-white/10 bg-card/50 dark:bg-card/30 backdrop-blur-sm hover:border-[#C1FF72] hover:shadow-[0_0_15px_rgba(193,255,114,0.4)] transition-all duration-300"
+                    >
+                      <span className="flex items-center gap-2">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Whitepaper
+                      </span>
+                    </Button>
+                  </HoverScale>
+                </div>
+              </ScaleIn>
             </div>
           </div>
 
@@ -278,31 +296,47 @@ export function HeroSection() {
         </div>
 
         {/* Stats bar - Orbit style inline */}
-        <div className="mt-16 lg:mt-24">
+        <FadeInUp delay={1.0} className="mt-16 lg:mt-24">
           {/* Label */}
-          <p className="text-sm text-muted-foreground text-center mb-8">
-            Global community of developers and traders dedicated to making the world a safer place with blockchain technology.
-          </p>
+          <FadeIn delay={1.1}>
+            <p className="text-sm text-muted-foreground text-center mb-8">
+              Global community of developers and traders dedicated to making the world a safer place with blockchain technology.
+            </p>
+          </FadeIn>
 
           {/* Stats */}
-          <div className="flex flex-wrap justify-center gap-8 md:gap-12 lg:gap-16 items-center py-8 px-6 rounded-2xl bg-card/30 dark:bg-card/20 backdrop-blur-sm border border-border/50 dark:border-white/10">
-            <StatItem value="2.5+" label="mil users" />
-            <StatSeparator />
-            <StatItem value="800+" label="developers" />
-            <StatSeparator />
-            <StatItem value="150+" label="countries" />
-            <StatSeparator />
-            <StatItem value="$400+" label="mil revenue" />
-          </div>
-        </div>
+          <StaggerContainer className="flex flex-wrap justify-center gap-8 md:gap-12 lg:gap-16 items-center py-8 px-6 rounded-2xl bg-card/30 dark:bg-card/20 backdrop-blur-sm border border-border/50 dark:border-white/10">
+            <StaggerItem>
+              <StatItem value={2500000} label="users" delay={1.2} />
+            </StaggerItem>
+            <StaggerItem>
+              <StatSeparator />
+            </StaggerItem>
+            <StaggerItem>
+              <StatItem value={800} label="developers" delay={1.3} />
+            </StaggerItem>
+            <StaggerItem>
+              <StatSeparator />
+            </StaggerItem>
+            <StaggerItem>
+              <StatItem value={150} label="countries" delay={1.4} />
+            </StaggerItem>
+            <StaggerItem>
+              <StatSeparator />
+            </StaggerItem>
+            <StaggerItem>
+              <StatItem value={400} label="mil revenue" prefix="$" delay={1.5} />
+            </StaggerItem>
+          </StaggerContainer>
+        </FadeInUp>
       </div>
 
       {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+      <FadeIn delay={1.6} className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
         <div className="w-6 h-10 rounded-full border-2 border-muted-foreground/30 flex items-start justify-center p-2">
           <div className="w-1 h-2 bg-muted-foreground/50 rounded-full animate-pulse" />
         </div>
-      </div>
-    </section>
+      </FadeIn>
+    </div>
   )
 }
