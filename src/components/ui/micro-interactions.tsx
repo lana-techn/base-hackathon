@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, MotionProps } from "framer-motion"
+import { m, MotionProps } from "framer-motion"
 import { cn } from "@/lib/utils"
 
 interface HoverScaleProps extends MotionProps {
@@ -16,7 +16,7 @@ const HoverScale = ({
   ...motionProps 
 }: HoverScaleProps) => {
   return (
-    <motion.div
+    <m.div
       whileHover={{ scale }}
       whileTap={{ scale: scale * 0.95 }}
       transition={{ type: "spring", stiffness: 400, damping: 17 }}
@@ -24,7 +24,7 @@ const HoverScale = ({
       {...motionProps}
     >
       {children}
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -41,7 +41,7 @@ const FloatingElement = ({
   ...motionProps 
 }: FloatingElementProps) => {
   return (
-    <motion.div
+    <m.div
       animate={{
         y: [-intensity, intensity, -intensity],
       }}
@@ -54,7 +54,7 @@ const FloatingElement = ({
       {...motionProps}
     >
       {children}
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -79,7 +79,7 @@ const PulseGlow = ({
   }
 
   return (
-    <motion.div
+    <m.div
       animate={{
         boxShadow: [
           `0 0 0px ${glowColors[color as keyof typeof glowColors]}`,
@@ -96,7 +96,7 @@ const PulseGlow = ({
       {...motionProps}
     >
       {children}
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -122,7 +122,7 @@ const SlideIn = ({
   }
 
   return (
-    <motion.div
+    <m.div
       initial={{ 
         opacity: 0, 
         ...directions[direction]
@@ -141,7 +141,7 @@ const SlideIn = ({
       {...motionProps}
     >
       {children}
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -157,7 +157,7 @@ const StaggerContainer = ({
   className 
 }: StaggerContainerProps) => {
   return (
-    <motion.div
+    <m.div
       initial="hidden"
       animate="visible"
       variants={{
@@ -172,7 +172,7 @@ const StaggerContainer = ({
       className={className}
     >
       {children}
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -182,7 +182,7 @@ const StaggerItem = ({
   ...motionProps 
 }: MotionProps & { children: React.ReactNode; className?: string }) => {
   return (
-    <motion.div
+    <m.div
       variants={{
         hidden: { opacity: 0, y: 20 },
         visible: { opacity: 1, y: 0 }
@@ -192,7 +192,7 @@ const StaggerItem = ({
       {...motionProps}
     >
       {children}
-    </motion.div>
+    </m.div>
   )
 }
 
