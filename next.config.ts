@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
 
   // Enable experimental features that are stable
   experimental: {
-    optimizePackageImports: ['@coinbase/onchainkit', 'lucide-react'],
+    optimizePackageImports: ['@coinbase/onchainkit', 'lucide-react', 'framer-motion'],
   },
 
   // Turbopack config (Next.js 16 default bundler)
