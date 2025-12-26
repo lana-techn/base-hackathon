@@ -1,53 +1,35 @@
 'use client'
 
-import { useEffect, useRef } from "react"
-import Lenis from "lenis"
+import { useEffect } from "react"
+import { gsapAnimationManager } from "@/lib/gsap-animation-manager"
 
 interface SmoothScrollProps {
   children: React.ReactNode
   options?: {
-    duration?: number
-    easing?: (t: number) => number
-    direction?: 'vertical' | 'horizontal'
-    gestureDirection?: 'vertical' | 'horizontal' | 'both'
-    smooth?: boolean
-    mouseMultiplier?: number
-    smoothTouch?: boolean
-    touchMultiplier?: number
+    smooth?: number
+    effects?: boolean
+    smoothTouch?: number
   }
 }
 
 const SmoothScroll = ({ children, options = {} }: SmoothScrollProps) => {
-  const lenisRef = useRef<Lenis | null>(null)
-
   useEffect(() => {
-    // Initialize Lenis
-    lenisRef.current = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      direction: 'vertical',
-      gestureDirection: 'vertical',
-      smooth: true,
-      mouseMultiplier: 1,
-      smoothTouch: false,
-      touchMultiplier: 2,
-      ...options
-    })
-
-    // Animation frame loop
-    function raf(time: number) {
-      lenisRef.current?.raf(time)
-      requestAnimationFrame(raf)
-    }
-    requestAnimationFrame(raf)
+    // Initialize GSAP Animation Manager with options
+    gsapAnimationManager.init()
 
     // Cleanup
     return () => {
-      lenisRef.current?.destroy()
+      gsapAnimationManager.destroy()
     }
   }, [options])
 
-  return <>{children}</>
+  return (
+    <div id="smooth-wrapper">
+      <div id="smooth-content">
+        {children}
+      </div>
+    </div>
+  )
 }
 
 export { SmoothScroll }
